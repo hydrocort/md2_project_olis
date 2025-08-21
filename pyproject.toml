@@ -1,0 +1,17 @@
+[project]
+name = "md2_project_olis"
+version = "0.1.0"
+description = "Dagster + dbt + BigQuery data pipeline"
+authors = [ { name = "Your Name" } ]
+requires-python = ">=3.10"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.dagster]
+module_name = "dagster_project.repository"
+code_location_name = "md2_project_olis"
+

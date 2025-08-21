@@ -1,0 +1,22 @@
+# Dagster core + UI (same version)
+dagster==1.8.11
+dagster-webserver==1.8.11
+
+# dbt integration matching 1.8.x
+dagster-dbt==0.24.11
+
+# dbt adapter for BigQuery (with dbt-core)
+dbt-bigquery==1.8.2
+
+# Google Cloud + SQL
+google-cloud-bigquery
+google-cloud-storage
+pybigquery
+sqlalchemy
+
+# Data + Quality
+pandas
+great-expectations
+
+# Ingestion
+meltano

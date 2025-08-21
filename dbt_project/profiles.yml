@@ -1,0 +1,12 @@
+
+md2_project_olis:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: polar-winter-468405-g1
+      dataset: olis_dataset
+      location: US
+      threads: 1
+      keyfile: /home/gendaff/sctp_project/md2_project_olis/polar-winter-468405-g1-02430a3a161d.json

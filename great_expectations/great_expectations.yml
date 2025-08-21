@@ -1,0 +1,15 @@
+
+datasources:
+  bigquery_datasource:
+    class_name: Datasource
+    execution_engine:
+      class_name: SqlAlchemyExecutionEngine
+      connection_string: bigquery://polar-winter-468405-g1/olis_dataset
+    data_connectors:
+      default_inferred_data_connector_name:
+        class_name: InferredAssetSqlDataConnector
+config_version: 3.0
+stores: {}
+expectations_store_name: expectations_store
+validations_store_name: validations_store
+data_docs_sites: {}

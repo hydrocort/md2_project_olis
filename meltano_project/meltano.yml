@@ -1,0 +1,37 @@
+
+version: 1
+project_id: md2_project_olis
+
+plugins:
+  extractors:
+    - name: tap-csv
+      variant: meltanolabs
+      pip_url: tap-csv
+      config:
+        files:
+          - entity: orders
+            path: data/orders.csv
+          - entity: customers
+            path: data/customers.csv
+          - entity: order_items
+            path: data/order_items.csv
+          - entity: products
+            path: data/products.csv
+          - entity: payments
+            path: data/payments.csv
+
+  loaders:
+    - name: target-bigquery
+      variant: singer-io
+      pip_url: target-bigquery
+      config:
+        project_id: polar-winter-468405-g1
+        dataset_id: raw
+        location: US
+        credentials_path: /home/gendaff/sctp_project/md2_project_olis/polar-winter-468405-g1-02430a3a161d.json
+        add_metadata_columns: false
+
+environments:
+  - name: dev
+    config:
+      plugins: {}

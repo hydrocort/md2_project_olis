@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.egg-info/
+
+# Virtualenvs
+.env
+.venv
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs & temp
+logs/
+*.log
+.tmp/
+
+# Credentials / secrets
+*.json
+!docs/*.json
+# keep sample env file if added
+.env.example
+
+# Dagster local state
+.DAGSTER_HOME/
+
+# Great Expectations validations & checkpoints outputs (optional)
+great_expectations/uncommitted/
+
+# dbt target build artifacts (can be regenerated)
+dbt_project/target/
+
+# Meltano state/cache
+.meltano/
+
+# Local outputs
+outputs_*.csv
+
+# Draw.io backup files
+*.bkp
+
+# tmp directories created during runs
+tmp*/
