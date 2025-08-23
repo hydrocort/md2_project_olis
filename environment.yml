@@ -6,14 +6,16 @@ dependencies:
   - python=3.10
   - pip
   - pip:
-      - dagster==1.8.11
-      - dagster-webserver==1.8.11
-      - dagster-dbt==0.24.11
-      - dbt-bigquery==1.8.2
+      - dagster==1.9.13
+      - dagster-webserver==1.9.13
+      - dagster-dbt==0.25.13
+      - dbt-bigquery==1.9.2
+      - dbt-core==1.9.6
       - google-cloud-bigquery
       - google-cloud-storage
       - pybigquery
       - sqlalchemy
       - pandas
       - great-expectations
-      - meltano
+      - meltano==3.7.8
+      - python-dotenv==1.1.0

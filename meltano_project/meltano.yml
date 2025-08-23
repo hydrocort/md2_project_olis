@@ -22,16 +22,11 @@ plugins:
 
   loaders:
     - name: target-bigquery
-      variant: singer-io
-      pip_url: target-bigquery
+      variant: z3z1ma
+      pip_url: git+https://github.com/z3z1ma/target-bigquery.git
       config:
         project_id: polar-winter-468405-g1
-        dataset_id: raw
+        dataset: olis_dataset
         location: US
         credentials_path: /home/gendaff/sctp_project/md2_project_olis/polar-winter-468405-g1-02430a3a161d.json
         add_metadata_columns: false
-
-environments:
-  - name: dev
-    config:
-      plugins: {}
