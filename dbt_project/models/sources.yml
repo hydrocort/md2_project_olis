@@ -1,8 +1,8 @@
 version: 2
 
 sources:
-  - name: raw
-    schema: raw
+  - name: olis_raw_dataset
+    schema: olis_raw_dataset
     tables:
       - name: orders
       - name: customers

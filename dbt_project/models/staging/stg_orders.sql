@@ -8,4 +8,4 @@ SELECT
     CAST(order_delivered_carrier_date AS TIMESTAMP) AS delivered_carrier_ts,
     CAST(order_delivered_customer_date AS TIMESTAMP) AS delivered_customer_ts,
     CAST(order_estimated_delivery_date AS TIMESTAMP) AS estimated_delivery_ts
-FROM {{ source('raw', 'orders') }}
+FROM {{ source('olis_raw_dataset', 'orders') }}
