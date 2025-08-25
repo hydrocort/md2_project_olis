@@ -1,32 +1,58 @@
-
 version: 1
+default_environment: dev
 project_id: md2_project_olis
-
+environments:
+- name: dev
+- name: staging
+- name: prod
 plugins:
   extractors:
-    - name: tap-csv
-      variant: meltanolabs
-      pip_url: tap-csv
-      config:
-        files:
-          - entity: orders
-            path: data/orders.csv
-          - entity: customers
-            path: data/customers.csv
-          - entity: order_items
-            path: data/order_items.csv
-          - entity: products
-            path: data/products.csv
-          - entity: payments
-            path: data/payments.csv
+  - name: tap-csv
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-csv.git
+    config:
+      files:
+      - entity: geolocation
+        path: data/geolocation.csv
+        keys: [geolocation_zip_code_prefix]
+      - entity: orders
+        path: data/orders.csv
+        keys: [order_id]
+      - entity: customers
+        path: data/customers.csv
+        keys: [customer_id]
+      - entity: order_items
+        path: data/order_items.csv
+        keys: [order_id, order_item_id]
+      - entity: products
+        path: data/products.csv
+        keys: [product_id]
+      - entity: payments
+        path: data/payments.csv
+        keys: [order_id, payment_sequential]
+      - entity: order_reviews
+        path: data/order_reviews.csv
+        keys: [review_id]
+      - entity: sellers
+        path: data/sellers.csv
+        keys: [seller_id]
+      - entity: product_category_name_translation
+        path: data/product_category_name_translation.csv
+        keys: [product_category_name]
 
+    select:
+    - product_category_name_translation.*
+    - '*.*'
   loaders:
-    - name: target-bigquery
-      variant: z3z1ma
-      pip_url: git+https://github.com/z3z1ma/target-bigquery.git
-      config:
-        project_id: polar-winter-468405-g1
-        dataset: olis_dataset
-        location: US
-        credentials_path: /home/gendaff/sctp_project/md2_project_olis/polar-winter-468405-g1-02430a3a161d.json
-        add_metadata_columns: false
+  - name: target-bigquery
+    variant: z3z1ma
+    pip_url: git+https://github.com/z3z1ma/target-bigquery.git
+    config:
+      project: polar-winter-468405-g1
+      dataset: olis_raw_dataset
+      method: storage_write_api
+      location: US
+      credentials_path: 
+        /home/gendaff/sctp_project/md2_project_olis/polar-winter-468405-g1-02430a3a161d.json
+      denormalized: true
+      add_metadata_columns: false
