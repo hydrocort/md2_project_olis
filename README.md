@@ -2,15 +2,14 @@
 # Meltano + Dagster + dbt + BigQuery Pipeline
 
 ## Quickstart
-1) `conda env create -f environment.yml` -> `conda activate olisenv`
-2) Configure GCP auth for BigQuery and GCS (service account JSON). This is your googlecloud key, if you have not done so.
-3) Configure:
-   - `dagster_project` (project_id)
-   - `dbt_project/profiles.yml` (project, dataset, keyfile, location)
-   - `meltano_project/meltano.yml` (project_id, credentials_path, dataset_id=raw)
-   - `great_expectations/great_expectations.yml` (proonnection_string: bigquery://<project_id>/<dataset>)
-4) Start Dagster UI: `dagster dev`
-5) In the UI, run the `full_pipeline` job.
+1) `conda deactivate`
+2) `conda env remove --name olisenv --all`
+3) `conda env create -f environment.yml`
+4) `conda activate olisenv`
+5) Copy env_sample -> .env
+6) change your "PROJECT_ID" and "CREDENTIALS_PATH"
+7) Start Dagster UI: `dagster dev`
+8) Start with Meltano_ingestion
 
 ### Successful Dagster UI
 Below is an example screenshot of a healthy `full_pipeline` job graph after `dagster dev` starts successfully (nodes show ingestion -> dbt fact_sales -> quality tests -> analysis):
