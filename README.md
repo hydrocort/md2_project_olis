@@ -7,9 +7,9 @@
 3) `conda env create -f environment.yml`
 4) `conda activate olisenv`
 5) Copy env_sample -> .env
-6) change your "PROJECT_ID" and "CREDENTIALS_PATH"
-7) cd meltano_project
-8) `meltano lock --update --all`
+6) change to your "PROJECT_ID" and "CREDENTIALS_PATH"
+7) `cd meltano_project`
+8) `meltano lock --update`
 9) Start Dagster UI: `dagster dev`
 10) Start with Meltano_ingestion
 
