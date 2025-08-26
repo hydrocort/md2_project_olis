@@ -6,12 +6,12 @@ from dagster import asset
 def run_data_quality_tests(context):
     """Simple SQL-based quality checks against BigQuery."""
     bq = context.resources.bigquery
-    q1 = "SELECT COUNT(*) AS c FROM my_dataset.fact_sales WHERE customer_id IS NULL"
+    q1 = "SELECT COUNT(*) AS c FROM olis_dataset_marts.fact_sales WHERE customer_id IS NULL"
     c1 = bq.query(q1).to_dataframe().iloc[0]["c"]
     if c1 > 0:
         raise Exception(f"Null customer_id in fact_sales: {c1}")
 
-    q2 = "SELECT COUNT(*) AS c FROM my_dataset.fact_sales WHERE order_amount < 0"
+    q2 = "SELECT COUNT(*) AS c FROM olis_dataset_marts.fact_sales WHERE order_amount < 0"
     c2 = bq.query(q2).to_dataframe().iloc[0]["c"]
     if c2 > 0:
         raise Exception(f"Negative order_amount rows: {c2}")

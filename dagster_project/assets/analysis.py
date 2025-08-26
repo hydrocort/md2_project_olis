@@ -6,9 +6,9 @@ def exploratory_analysis(context):
     bq = context.resources.bigquery
     q = '''
     SELECT
-      FORMAT_DATE('%Y-%m', order_ts) AS month,
+      FORMAT_DATE('%Y-%m', order_date) AS month,
       SUM(order_amount) AS monthly_sales
-    FROM my_dataset.fact_sales
+    FROM olis_dataset_marts.fact_sales
     GROUP BY 1
     ORDER BY 1
     '''
