@@ -1,8 +1,8 @@
 version: 2
 
 sources:
-  - name: olis_raw_dataset
-    schema: olis_raw_dataset
+  - name: raw
+    schema: "{{ env_var('RAW_DATASET_NAME') }}"
     tables:
       - name: orders
       - name: customers

@@ -7,4 +7,4 @@ SELECT
     seller_id,
     price,
     freight_value
-FROM {{ source('olis_raw_dataset', 'order_items') }}
+FROM {{ source('raw', 'order_items') }}
