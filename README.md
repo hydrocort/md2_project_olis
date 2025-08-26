@@ -2,12 +2,12 @@
 # Meltano + Dagster + dbt + BigQuery Pipeline
 
 ## Quickstart
-1) `conda deactivate`
-2) `conda env remove --name olisenv --all`
-3) `conda env create -f environment.yml`
-4) `conda activate olisenv`
-5) Copy env_sample -> .env
-6) change to your "PROJECT_ID" and "CREDENTIALS_PATH"
+1) Copy env_sample -> .env
+2) change to your "PROJECT_ID" and "CREDENTIALS_PATH"
+3) `conda deactivate`
+4) `conda env remove --name olisenv --all`
+5) `conda env create -f environment.yml`
+6) `conda activate olisenv`
 7) `cd meltano_project`
 8) `meltano lock --update`
 9) Start Dagster UI: `dagster dev`
