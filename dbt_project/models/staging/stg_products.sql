@@ -10,4 +10,4 @@ SELECT
     product_length_cm,
     product_height_cm,
     product_width_cm
-FROM {{ source('olis_raw_dataset', 'products') }}
+FROM {{ source('raw', 'products') }}

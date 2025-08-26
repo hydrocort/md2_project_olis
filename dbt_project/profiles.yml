@@ -5,8 +5,8 @@ md2_project_olis:
     dev:
       type: bigquery
       method: service-account
-      project: polar-winter-468405-g1
-      dataset: olis_dataset
+      project: "{{ env_var('PROJECT_ID') }}"
+      dataset: "{{ env_var('STAGING_DATASET_NAME') }}"
       location: US
       threads: 1
-      keyfile: /home/gendaff/sctp_project/md2_project_olis/polar-winter-468405-g1-02430a3a161d.json
+      keyfile: "{{ env_var('CREDENTIALS_PATH') }}"
