@@ -16,6 +16,7 @@ Below is an example screenshot of a healthy `full_pipeline` job graph after `dag
 
 ![Dagster full_pipeline success](docs/screenshot_full_pipeline.png)
 
+
 ## Structure
 - `dagster_project/` Dagster assets/resources/jobs/schedules
 - `dbt_project/` dbt models and profiles
