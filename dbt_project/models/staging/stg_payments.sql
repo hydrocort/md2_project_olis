@@ -6,4 +6,4 @@ SELECT
     payment_type,
     payment_installments,
     payment_value
-FROM {{ source('olis_raw_dataset', 'payments') }}
+FROM {{ source('raw', 'payments') }}

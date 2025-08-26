@@ -4,11 +4,12 @@ from dagster import asset
 @asset(deps=["run_data_quality_tests"], required_resource_keys={"bigquery"})
 def exploratory_analysis(context):
     bq = context.resources.bigquery
-    q = '''
+    marts_dataset = bq.marts_dataset
+    q = f'''
     SELECT
       FORMAT_DATE('%Y-%m', order_date) AS month,
       SUM(order_amount) AS monthly_sales
-    FROM olis_dataset_marts.fact_sales
+    FROM {marts_dataset}_marts.fact_sales
     GROUP BY 1
     ORDER BY 1
     '''

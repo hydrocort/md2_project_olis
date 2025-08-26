@@ -1,0 +1,6 @@
+# .env file for project configuration
+PROJECT_ID=your_project_id
+CREDENTIALS_PATH=your_credentials_path.json
+RAW_DATASET_NAME=olis_raw_dataset
+STAGING_DATASET_NAME=olis_staging_dataset
+MARTS_DATASET_NAME=olis_dataset_marts
