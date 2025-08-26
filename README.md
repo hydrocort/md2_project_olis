@@ -8,8 +8,10 @@
 4) `conda activate olisenv`
 5) Copy env_sample -> .env
 6) change your "PROJECT_ID" and "CREDENTIALS_PATH"
-7) Start Dagster UI: `dagster dev`
-8) Start with Meltano_ingestion
+7) cd meltano_project
+8) `meltano lock --update --all`
+9) Start Dagster UI: `dagster dev`
+10) Start with Meltano_ingestion
 
 ### Successful Dagster UI
 Below is an example screenshot of a healthy `full_pipeline` job graph after `dagster dev` starts successfully (nodes show ingestion -> dbt fact_sales -> quality tests -> analysis):
