@@ -16,3 +16,23 @@ models:
     marts:
       +schema: marts
       +materialized: table
+      # Dimension tables
+      dimensions:
+        +materialized: table
+        +schema: marts
+        
+      # Fact tables  
+      facts:
+        +materialized: table
+        +schema: marts
+
+# Configure seeds
+seeds:
+  md2_project_olis:
+    +schema: seed
+    brazil_state_regions:
+      +column_types:
+        state_code: string
+        state_name: string
+        region: string
+        economic_zone: string

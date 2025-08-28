@@ -1,11 +1,16 @@
 version: 2
 
 sources:
-  - name: raw
+  - name: "{{ env_var('RAW_DATASET_NAME') }}"
     schema: "{{ env_var('RAW_DATASET_NAME') }}"
     tables:
       - name: orders
       - name: customers
-      - name: order_items
       - name: products
+      - name: order_items
       - name: payments
+      - name: sellers
+      - name: order_reviews
+      - name: product_category_name_translation
+      - name: geolocation
+

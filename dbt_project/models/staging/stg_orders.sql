@@ -1,11 +1,24 @@
+with source as (
+    select
+        trim(order_id) as order_id,
+        trim(customer_id) as customer_id,
+        lower(trim(order_status)) as order_status,
+        safe_cast(trim(order_purchase_timestamp) as timestamp) as order_purchase_timestamp,
+        safe_cast(trim(order_approved_at) as timestamp) as order_approved_at,
+        safe_cast(trim(order_delivered_carrier_date) as timestamp) as order_delivered_carrier_date,
+        safe_cast(trim(order_delivered_customer_date) as timestamp) as order_delivered_customer_date,
+        safe_cast(trim(order_estimated_delivery_date) as timestamp) as order_estimated_delivery_date
+    from {{ source('olis_raw_dataset', 'orders') }}
+    where order_id is not null
+)
 
-{{ config(materialized='view') }}
-SELECT
+select
     order_id,
     customer_id,
-    CAST(order_purchase_timestamp AS TIMESTAMP) AS order_ts,
-    CAST(order_approved_at AS TIMESTAMP) AS approved_ts,
-    CAST(order_delivered_carrier_date AS TIMESTAMP) AS delivered_carrier_ts,
-    CAST(order_delivered_customer_date AS TIMESTAMP) AS delivered_customer_ts,
-    CAST(order_estimated_delivery_date AS TIMESTAMP) AS estimated_delivery_ts
-FROM {{ source('raw', 'orders') }}
+    order_status,
+    order_purchase_timestamp,
+    order_approved_at,
+    order_delivered_carrier_date,
+    order_delivered_customer_date,
+    order_estimated_delivery_date
+from source
