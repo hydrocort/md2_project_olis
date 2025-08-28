@@ -1,0 +1,28 @@
+state_code,state_name,region,economic_zone
+AC,Acre,North,Amazon
+AL,Alagoas,Northeast,Northeast
+AM,Amazonas,North,Amazon
+AP,Amapá,North,Amazon
+BA,Bahia,Northeast,Northeast
+CE,Ceará,Northeast,Northeast
+DF,Distrito Federal,Central-West,Central
+ES,Espírito Santo,Southeast,Southeast
+GO,Goiás,Central-West,Central
+MA,Maranhão,Northeast,Northeast
+MG,Minas Gerais,Southeast,Southeast
+MS,Mato Grosso do Sul,Central-West,Central
+MT,Mato Grosso,Central-West,Central
+PA,Pará,North,Amazon
+PB,Paraíba,Northeast,Northeast
+PE,Pernambuco,Northeast,Northeast
+PI,Piauí,Northeast,Northeast
+PR,Paraná,South,South
+RJ,Rio de Janeiro,Southeast,Southeast
+RN,Rio Grande do Norte,Northeast,Northeast
+RO,Rondônia,North,Amazon
+RR,Roraima,North,Amazon
+RS,Rio Grande do Sul,South,South
+SC,Santa Catarina,South,South
+SE,Sergipe,Northeast,Northeast
+SP,São Paulo,Southeast,Southeast
+TO,Tocantins,North,Amazon
