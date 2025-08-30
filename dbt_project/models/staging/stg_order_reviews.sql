@@ -7,7 +7,7 @@ with source as (
         trim(review_comment_message) as review_comment_message,
         safe_cast(trim(review_creation_date) as timestamp) as review_creation_date,
         safe_cast(trim(review_answer_timestamp) as timestamp) as review_answer_timestamp
-    from {{ source('olis_raw_dataset', 'order_reviews') }}
+    from {{ source(env_var('RAW_DATASET_NAME'), 'order_reviews') }}
     where review_id is not null
 )
 

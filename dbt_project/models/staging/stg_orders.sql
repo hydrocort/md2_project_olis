@@ -8,7 +8,7 @@ with source as (
         safe_cast(trim(order_delivered_carrier_date) as timestamp) as order_delivered_carrier_date,
         safe_cast(trim(order_delivered_customer_date) as timestamp) as order_delivered_customer_date,
         safe_cast(trim(order_estimated_delivery_date) as timestamp) as order_estimated_delivery_date
-    from {{ source('olis_raw_dataset', 'orders') }}
+    from {{ source(env_var('RAW_DATASET_NAME'), 'orders') }}
     where order_id is not null
 )
 
