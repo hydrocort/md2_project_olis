@@ -1,0 +1,29 @@
+# Streamlit Dashboard Core Dependencies
+# These are the minimum required packages for the dashboard to run
+
+# Core Streamlit and data processing
+streamlit>=1.48.0
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Visualization
+plotly>=6.3.0
+
+# BigQuery connectivity
+google-cloud-bigquery>=3.36.0
+google-auth>=2.40.0
+google-auth-oauthlib>=1.2.0
+
+# Data handling
+pyarrow>=21.0.0
+
+# Configuration parsing
+toml>=0.10.0
+
+# Note: This requirements.txt is for deployment scenarios
+# For local development, use the conda environment.yml instead
+
+
+
+
+
