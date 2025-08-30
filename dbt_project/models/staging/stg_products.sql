@@ -10,7 +10,7 @@ with source as (
         SAFE_CAST(NULLIF(trim(product_length_cm), '') AS INT64) as product_length_cm,
         SAFE_CAST(NULLIF(trim(product_height_cm), '') AS INT64) as product_height_cm,
         SAFE_CAST(NULLIF(trim(product_width_cm), '') AS INT64) as product_width_cm
-    from  {{ source('olis_raw_dataset', 'products') }} prds
+    from  {{ source(env_var('RAW_DATASET_NAME'), 'products') }} prds
     where product_id is not null
 
 )

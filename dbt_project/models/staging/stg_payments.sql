@@ -5,7 +5,7 @@ with source as (
         lower(trim(payment_type)) as payment_type,
         safe_cast(trim(payment_installments) as int64) as payment_installments,
         safe_cast(trim(payment_value) as numeric) as payment_value
-    from {{ source('olis_raw_dataset', 'payments') }}
+    from {{ source(env_var('RAW_DATASET_NAME'), 'payments') }}
     where order_id is not null
 )
 

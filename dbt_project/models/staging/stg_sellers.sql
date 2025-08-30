@@ -6,7 +6,7 @@ with source as (
         upper(trim(seller_state)) as seller_state,
         -- Remove Meltano metadata columns
         -- _sdc_extracted_at, _sdc_table_version
-    from {{ source('olis_raw_dataset', 'sellers') }}
+    from {{ source(env_var('RAW_DATASET_NAME'), 'sellers') }}
     where seller_id is not null
 )
 
