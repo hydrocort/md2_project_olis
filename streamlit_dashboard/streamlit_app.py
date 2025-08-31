@@ -441,18 +441,6 @@ def main():
             flow_data = get_customer_seller_flow(year_filter=selected_year)
             
             if not regional_data.empty:
-                # Convert Decimal columns to float for compatibility
-                for col in regional_data.columns:
-                    if regional_data[col].dtype == 'object' and regional_data[col].apply(lambda x: hasattr(x, 'as_tuple')).any():
-                        regional_data[col] = regional_data[col].astype(float)
-                # Also convert in summaries if needed
-                for df in [regional_data]:
-                    for col in df.select_dtypes(include='object').columns:
-                        try:
-                            df[col] = df[col].astype(float)
-                        except Exception:
-                            pass
-
                 # Summary metrics by region
                 customer_region_summary = regional_data.groupby('customer_region').agg({
                     'total_sales': 'sum',
@@ -475,21 +463,21 @@ def main():
                         help="Number of Brazilian regions in analysis"
                     )
                 with col2:
-                    total_sales = float(regional_data['total_sales'].sum())
+                    total_sales = regional_data['total_sales'].sum()
                     st.metric(
                         "Total Sales",
                         f"${total_sales:,.2f}",
                         help="Combined sales across all regions"
                     )
                 with col3:
-                    total_customers = int(customer_region_summary['unique_customers'].sum())
+                    total_customers = customer_region_summary['unique_customers'].sum()
                     st.metric(
                         "Total Customers",
                         f"{total_customers:,}",
                         help="Unique customers across all regions"
                     )
                 with col4:
-                    total_sellers = int(seller_region_summary['unique_sellers'].sum())
+                    total_sellers = seller_region_summary['unique_sellers'].sum()
                     st.metric(
                         "Total Sellers",
                         f"{total_sellers:,}",
@@ -557,7 +545,7 @@ def main():
                             st.write("**Top Cross-Region Flows**")
                             cross_region_display = cross_region.copy()
                             cross_region_display['Flow'] = cross_region_display['customer_region'] + ' → ' + cross_region_display['seller_region']
-                            cross_region_display['total_sales'] = cross_region_display['total_sales'].apply(lambda x: f"${float(x):,.2f}")
+                            cross_region_display['total_sales'] = cross_region_display['total_sales'].apply(lambda x: f"${x:,.2f}")
                             
                             st.dataframe(
                                 cross_region_display[['Flow', 'total_sales', 'total_orders']].rename(columns={

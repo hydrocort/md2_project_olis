@@ -48,3 +48,5 @@ outputs_*.csv
 
 # tmp directories created during runs
 tmp*/
+.user.yml
+package-lock.yml

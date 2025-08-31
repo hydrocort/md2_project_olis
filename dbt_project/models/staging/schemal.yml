@@ -1,0 +1,265 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: "Staging model for customer data with regional classifications"
+    columns:
+      - name: customer_id
+        description: "Primary key for customer dimension"
+        tests:
+          - not_null
+          - unique
+      - name: customer_unique_id
+        description: "Customer's unique identifier across the platform"
+        tests:
+          - not_null
+      - name: customer_city
+        description: "Customer's city"
+        tests:
+          - not_null
+      - name: customer_state
+        description: "Customer's state (2-letter Brazilian state code)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SP', 'SE', 'TO']
+      - name: customer_zip_prefix
+        description: "Customer's zip code prefix for location"
+        tests:
+          - not_null
+      - name: _sdc_extracted_at
+        description: "Timestamp when the record was extracted from source"
+      - name: _sdc_table_version
+        description: "Version of the source table"
+
+  - name: stg_orders
+    description: "Staging model for order data with delivery performance calculations"
+    columns:
+      - name: order_id
+        description: "Primary key for order dimension"
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "Reference to the customer"
+        tests:
+          - not_null
+      - name: order_purchase_timestamp
+        description: "When the order was placed"
+        tests:
+          - not_null
+      - name: order_approved_at
+        description: "When the order was approved"
+      - name: order_delivered_carrier_date
+        description: "When the order was delivered to carrier"
+      - name: order_delivered_customer_date
+        description: "When the order was delivered to customer"
+      - name: order_estimated_delivery_date
+        description: "Estimated delivery date"
+        tests:
+          - not_null
+      - name: _sdc_extracted_at
+        description: "Timestamp when the record was extracted from source"
+      - name: _sdc_table_version
+        description: "Version of the source table"
+
+  - name: stg_order_items
+    description: "Staging model for order item data with pricing calculations"
+    columns:
+      - name: order_id
+        description: "Reference to the order"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: order_item_id
+        description: "Unique identifier for each item within an order"
+        tests:
+          - not_null
+      - name: product_id
+        description: "Reference to the product"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_products')
+              field: product_id
+      - name: seller_id
+        description: "Reference to the seller"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sellers')
+              field: seller_id
+      - name: shipping_limit_date
+        description: "Shipping deadline for the item"
+        tests:
+          - not_null
+      - name: price
+        description: "Price of the item"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0.01  # Minimum valid price
+              max_value: 999999  # Maximum reasonable price
+      - name: freight_value
+        description: "Shipping cost for the item"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0.0  # Allow free shipping
+              max_value: 999999  # Maximum reasonable shipping cost
+
+  - name: stg_order_payments
+    description: "Staging model for payment data with payment method aggregation"
+    columns:
+      - name: order_id
+        description: "Reference to the order"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: payment_sequential
+        description: "Payment sequence number for the order"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1  # Sequential numbers start at 1
+              max_value: 999  # Maximum reasonable sequence number
+      - name: payment_type
+        description: "Type of payment method used"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['CREDIT_CARD', 'BOLETO', 'VOUCHER', 'DEBIT_CARD', 'NOT_DEFINED']
+      - name: payment_installments
+        description: "Number of installments for the payment"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0  # Allow 0 installments (actual data shows this exists)
+              max_value: 24  # Maximum from actual data
+      - name: payment_value
+        description: "Total payment amount"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0.0  # Allow 0.0 payments (actual data shows this exists)
+              max_value: 15000  # Slightly above actual max (13,664.08)
+
+  - name: stg_order_reviews
+    description: "Staging model for customer review data with timing calculations"
+    columns:
+      - name: review_id
+        description: "Review identifier (may be reused across multiple orders for template/batch reviews)"
+        tests:
+          - not_null
+      - name: order_id
+        description: "Reference to the order being reviewed"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: review_score
+        description: "Review score from 1 to 5"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+              max_value: 5
+              inclusive: true
+      - name: review_comment_title
+        description: "Title of the review comment"
+      - name: review_comment_message
+        description: "Full review comment message"
+      - name: review_creation_date
+        description: "When the review was created"
+        tests:
+          - not_null
+      - name: review_answer_timestamp
+        description: "When the review was answered"
+
+
+  - name: stg_products
+    description: "Staging model for product data with category translations and derived dimensions"
+    columns:
+      - name: product_id
+        description: "Primary key for product dimension"
+        tests:
+          - not_null
+          - unique
+      - name: product_category_name
+        description: "Product category name in Portuguese"
+        tests:
+          - dbt_utils.not_null_proportion:
+              at_least: 0.98  # Allow up to 2% NULLs (current is 1.85%)
+
+  - name: stg_sellers
+    description: "Staging model for seller data with regional classifications"
+    columns:
+      - name: seller_id
+        description: "Primary key for seller dimension"
+        tests:
+          - not_null
+          - unique
+      - name: seller_city
+        description: "Seller's city"
+        tests:
+          - not_null
+      - name: seller_state
+        description: "Seller's state (2-letter Brazilian state code)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SP', 'SE', 'TO']
+      - name: seller_zip_prefix
+        description: "Seller's zip code prefix for location"
+        tests:
+          - not_null
+
+  - name: stg_geolocation
+    description: "Staging model for geolocation data with coordinate validation"
+    columns:
+      - name: geolocation_zip_code_prefix
+        description: "Zip code prefix for location"
+        tests:
+          - not_null
+      - name: geolocation_lat
+        description: "Latitude coordinate"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -90
+              max_value: 90
+      - name: geolocation_lng
+        description: "Longitude coordinate"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -180
+              max_value: 180
+      - name: geolocation_city
+        description: "City name"
+        tests:
+          - not_null
+      - name: geolocation_state
+        description: "State name (2-letter Brazilian state code)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SP', 'SE', 'TO']
+
+  - name: stg_category_translation
+    description: "Staging model for product category translation data (Portuguese to English)"
+    columns:
+      - name: product_category_name
+        description: "Product category name in Portuguese"
+        tests:
+          - not_null
+          - unique
+      - name: product_category_name_english
+        description: "Product category name in English"
+        tests:
+          - not_null
