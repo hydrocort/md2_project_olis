@@ -266,7 +266,7 @@ models:
       - name: review_creation_date
         description: "When the review was created"
         tests:
-          - ndbt_expectations.expect_column_values_to_not_be_null
+          - dbt_expectations.expect_column_values_to_not_be_null
 
   # Fact Table
   - name: fact_sales
