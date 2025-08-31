@@ -9,10 +9,42 @@ from google.oauth2 import service_account
 import pandas as pd
 import logging
 from typing import Optional, Dict, Any
+import os
+from pathlib import Path
+from dotenv import load_dotenv
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# --- Load .env (prefer .env, fallback to .env.sample / env_sample) ---
+root_dir = Path(__file__).resolve().parents[2]  # go up 2 levels
+env_candidates = [root_dir / ".env", root_dir / ".env.sample", root_dir / "env_sample"]
+
+for p in env_candidates:
+    if p.exists():
+        load_dotenv(dotenv_path=p)
+        logger.info("Loaded environment variables from %s", p)
+        break
+else:
+    logger.warning("No .env file found; relying on existing environment variables")
+
+PROJECT_ID = os.getenv("PROJECT_ID")  # or your project var
+# --- Resolve marts dataset name robustly ---
+RAW_NAME = os.getenv("MARTS_DATASET_NAME", "").strip()
+
+def ensure_marts_suffix(name: str) -> str:
+    """Append '_marts' only if not already present; raise if empty."""
+    if not name:
+        raise EnvironmentError("MARTS_DATASET_NAME is not set (or empty).")
+    return name if name.endswith("_marts") else f"{name}_marts"
+
+try:
+    marts_dataset = ensure_marts_suffix(RAW_NAME)
+except EnvironmentError as e:
+    # You can choose to default or hard-fail; here we hard-fail loudly.
+    logger.error(str(e))
+    raise
 
 @st.cache_resource
 def init_connection() -> bigquery.Client:
@@ -105,10 +137,10 @@ def test_connection() -> bool:
         client = init_connection()
         
         # Simple test query
-        test_query = """
+        test_query = f"""
         SELECT 
             COUNT(*) as table_count
-        FROM `olist_marts.__TABLES__`
+        FROM `{PROJECT_ID}.{marts_dataset}.__TABLES__`
         WHERE table_id LIKE 'dim_%' OR table_id LIKE 'fact_%'
         """
         
@@ -125,7 +157,7 @@ def test_connection() -> bool:
         st.error(f"❌ BigQuery connection failed: {str(e)}")
         return False
 
-def get_table_info(dataset_id: str = "olist_marts") -> pd.DataFrame:
+def get_table_info(dataset_id: str = f"{marts_dataset}") -> pd.DataFrame:
     """
     Get information about tables in the specified dataset
     
@@ -145,7 +177,7 @@ def get_table_info(dataset_id: str = "olist_marts") -> pd.DataFrame:
             size_bytes,
             TIMESTAMP_MILLIS(creation_time) as created,
             TIMESTAMP_MILLIS(last_modified_time) as last_modified
-        FROM `{client.project}.{dataset_id}.__TABLES__`
+        FROM `{PROJECT_ID}.{dataset_id}.__TABLES__`
         ORDER BY table_id
         """
         
@@ -171,7 +203,7 @@ def get_sample_data(table_name: str, limit: int = 5) -> pd.DataFrame:
         
         query = f"""
         SELECT *
-        FROM `{client.project}.olist_marts.{table_name}`
+        FROM `{PROJECT_ID}.{marts_dataset}.{table_name}`
         LIMIT {limit}
         """
         
@@ -181,7 +213,7 @@ def get_sample_data(table_name: str, limit: int = 5) -> pd.DataFrame:
         logger.error(f"Failed to get sample data from {table_name}: {str(e)}")
         return pd.DataFrame()
 
-def validate_table_exists(table_name: str, dataset_id: str = "olist_marts") -> bool:
+def validate_table_exists(table_name: str, dataset_id: str = marts_dataset) -> bool:
     """
     Check if a table exists in the specified dataset
     
@@ -197,7 +229,7 @@ def validate_table_exists(table_name: str, dataset_id: str = "olist_marts") -> b
         
         query = f"""
         SELECT COUNT(*) as table_count
-        FROM `{client.project}.{dataset_id}.__TABLES__`
+        FROM `{PROJECT_ID}.{dataset_id}.__TABLES__`
         WHERE table_id = '{table_name}'
         """
         

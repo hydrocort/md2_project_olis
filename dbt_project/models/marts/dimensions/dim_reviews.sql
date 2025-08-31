@@ -13,6 +13,33 @@ WITH review_base AS (
   WHERE order_id IS NOT NULL
 ),
 
+-- Deduplicate reviews: keep most recent review per order
+deduplicated_reviews AS (
+  SELECT 
+    review_key,
+    review_score,
+    review_comment_title,
+    review_comment_message,
+    review_creation_date,
+    -- Use ROW_NUMBER to rank reviews by creation date (most recent first)
+    ROW_NUMBER() OVER (
+      PARTITION BY review_key 
+      ORDER BY review_creation_date DESC, review_score DESC
+    ) as rn
+  FROM review_base
+),
+
+unique_reviews AS (
+  SELECT 
+    review_key,
+    review_score,
+    review_comment_title,
+    review_comment_message,
+    review_creation_date
+  FROM deduplicated_reviews
+  WHERE rn = 1  -- Keep only the most recent review per order
+),
+
 review_metrics AS (
   SELECT
     r.*,
@@ -48,7 +75,7 @@ review_metrics AS (
       ELSE NULL
     END as days_to_review
     
-  FROM review_base r
+  FROM unique_reviews r  -- Use deduplicated reviews instead of review_base
 )
 
 SELECT * FROM review_metrics

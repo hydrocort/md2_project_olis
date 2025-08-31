@@ -12,6 +12,7 @@ dependencies:
       - dbt-bigquery==1.9.2
       - dbt-core==1.9.6
       - google-cloud-bigquery
+      - google-cloud-bigquery-storage
       - google-cloud-storage
       - pybigquery
       - sqlalchemy
@@ -26,3 +27,4 @@ dependencies:
       - google-auth-oauthlib
       - pyarrow
       - toml
+      - python-dotenv

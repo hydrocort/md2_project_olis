@@ -24,9 +24,9 @@ font = "sans serif"
 
 [client]
 # Client-side configuration
+toolbarMode = "viewer"
 showErrorDetails = true
-caching = true
-displayEnabled = true
+showSidebarNavigation = true
 
 [runner]
 # Runner configuration
