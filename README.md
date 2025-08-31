@@ -10,12 +10,14 @@
 4) `conda activate olisenv`
 7) `cd meltano_project`
 8) `meltano lock --update --all`
-9) Go to project root `cd ..`
-10) Start Dagster UI: `dagster dev`
-11) Click full_pipeline -> Materialize All
-12) To run streamlit, open a new terminal and change into streamlit directory, `cd streamlit_dashboard`
-13) `conda activate olisenv`
-14) `streamlit run streamlit_app.py`
+9) `cd ../dbt_project`
+10) `dbt deps`
+11) Go to project root `cd ..`
+12) Start Dagster UI: `dagster dev`
+13) Click full_pipeline -> Materialize All
+14) To run streamlit, open a new terminal and change into streamlit directory, `cd streamlit_dashboard`
+15) `conda activate olisenv`
+16) `streamlit run streamlit_app.py`
 
 ### Successful Dagster UI
 Below is an example screenshot of a healthy `full_pipeline` job graph after `dagster dev` starts successfully:

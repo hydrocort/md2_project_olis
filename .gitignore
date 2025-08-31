@@ -50,3 +50,4 @@ outputs_*.csv
 tmp*/
 .user.yml
 package-lock.yml
+dbt_packages/
