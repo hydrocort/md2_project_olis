@@ -15,7 +15,8 @@
 11) Start with Meltano_ingestion
 12) Materialize stg_customers
 13) To run streamlit, open a new terminal and change into streamlit directory, `cd streamlit_dashboard`
-14) `streamlit run streamlit_app.py`
+14) `conda activate olisenv`
+15) `streamlit run streamlit_app.py`
 
 ### Successful Dagster UI
 Below is an example screenshot of a healthy `full_pipeline` job graph after `dagster dev` starts successfully (nodes show ingestion -> dbt fact_sales -> quality tests -> analysis):
