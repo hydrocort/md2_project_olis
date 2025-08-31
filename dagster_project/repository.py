@@ -1,6 +1,6 @@
-
 from dagster import Definitions
-from dagster_project.assets import meltano_ingestion, dbt_models, quality_checks, analysis
+from dagster_project.assets.meltano_ingestion import meltano_ingestion
+from dagster_project.assets.dbt_models import dbt_run, dbt_test
 from dagster_project.jobs.pipeline import full_pipeline_job
 from dagster_project.schedules.daily_schedule import daily_pipeline_schedule
 from dagster_project.resources.bigquery import bigquery_resource
@@ -10,17 +10,11 @@ from dagster_project.resources.env_loader import load_dotenv
 load_dotenv()  # Ensure .env is loaded for all resources
 
 defs = Definitions(
-    assets=[
-        meltano_ingestion.meltano_ingestion,
-        dbt_models.dbt_assets,
-        quality_checks.run_data_quality_tests,
-        analysis.exploratory_analysis,
-    ],
+    assets=[meltano_ingestion, dbt_run, dbt_test],
     jobs=[full_pipeline_job],
     schedules=[daily_pipeline_schedule],
     resources={
         "bigquery": bigquery_resource,
-        # dbt CLI resource used by dagster-dbt assets
         "dbt": DbtCliResource(project_dir="dbt_project", profiles_dir="dbt_project"),
     },
 )
