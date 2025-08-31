@@ -127,7 +127,7 @@ def main():
                 
                 # Display sample data
                 st.subheader("Sample Data")
-                st.dataframe(sample_data, use_container_width=True)
+                st.dataframe(sample_data, width="stretch")
                 
                 # Basic statistics for numeric columns
                 numeric_cols = sample_data.select_dtypes(include=['number']).columns
@@ -151,7 +151,7 @@ def main():
                                 title=f"Value Distribution: {col}",
                                 labels={'x': col, 'y': 'Count'}
                             )
-                            st.plotly_chart(fig, use_container_width=True)
+                            st.plotly_chart(fig, width="stretch")
                         else:
                             st.write(f"**{col}**: {sample_data[col].nunique()} unique values (too many to display)")
                 
@@ -172,6 +172,8 @@ def main():
                 table_info = get_table_info()
                 
                 if not table_info.empty:
+                    # Add size_mb column to table_info for downstream use
+                    table_info['size_mb'] = table_info['size_bytes'] / (1024 * 1024)
                     st.success("Data quality analysis completed!")
                     
                     # Display table sizes
@@ -180,7 +182,7 @@ def main():
                     with col1:
                         st.subheader("Table Sizes")
                         size_df = table_info[['table_id', 'row_count']].copy()
-                        size_df['size_mb'] = table_info['size_bytes'] / (1024 * 1024)
+                        size_df['size_mb'] = table_info['size_mb']
                         
                         # Create size visualization
                         fig = px.bar(
@@ -190,7 +192,7 @@ def main():
                             title="Row Counts by Table",
                             labels={'table_id': 'Table', 'row_count': 'Row Count'}
                         )
-                        st.plotly_chart(fig, use_container_width=True)
+                        st.plotly_chart(fig, width="stretch")
                     
                     with col2:
                         st.subheader("Storage Usage")
@@ -200,13 +202,13 @@ def main():
                             names='table_id',
                             title="Storage Usage by Table (MB)"
                         )
-                        st.plotly_chart(fig, use_container_width=True)
+                        st.plotly_chart(fig, width="stretch")
                     
                     # Display detailed table info
                     st.subheader("Detailed Table Information")
                     st.dataframe(
                         table_info[['table_id', 'row_count', 'size_mb', 'created', 'last_modified']],
-                        use_container_width=True
+                        width="stretch"
                     )
                     
                 else:
