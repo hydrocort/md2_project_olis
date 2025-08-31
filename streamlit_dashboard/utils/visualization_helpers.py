@@ -471,14 +471,21 @@ def create_regional_heatmap(df: pd.DataFrame) -> go.Figure:
     """
     if df.empty:
         return go.Figure()
-    
+
+    # Ensure total_sales is float to avoid Decimal errors
+    df = df.copy()
+    df['total_sales'] = df['total_sales'].astype(float)
+
     # Pivot data for heatmap
     pivot_df = df.pivot(
-        index='customer_region', 
-        columns='seller_region', 
+        index='customer_region',
+        columns='seller_region',
         values='total_sales'
     ).fillna(0)
-    
+
+    # Ensure all values are float (in case pivot returns object dtype)
+    pivot_df = pivot_df.astype(float)
+
     fig = go.Figure(data=go.Heatmap(
         z=pivot_df.values,
         x=pivot_df.columns,
@@ -489,7 +496,7 @@ def create_regional_heatmap(df: pd.DataFrame) -> go.Figure:
         textfont={"size": 14},
         hoverongaps=False
     ))
-    
+
     fig.update_layout(
         title="Regional Sales Heatmap (Customer vs Seller)",
         title_x=0.5,
@@ -499,7 +506,7 @@ def create_regional_heatmap(df: pd.DataFrame) -> go.Figure:
         plot_bgcolor='white',
         paper_bgcolor='white'
     )
-    
+
     return fig
 
 def create_payment_method_chart(df: pd.DataFrame) -> go.Figure:
