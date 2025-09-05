@@ -3,8 +3,8 @@ import os, subprocess
 from pathlib import Path
 from dagster import asset, MaterializeResult, MetadataValue, AssetKey
 
-# Go up one level from the dbt_project folder
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Go up 2 level from the dbt_project folder
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DBT_PROJECT_DIR = os.path.join(PROJECT_ROOT, "dbt_project")
 REPORT_PATH = os.path.join(PROJECT_ROOT, "artifacts", "elementary_report.html")
 
@@ -17,10 +17,20 @@ ELEMENTARY_PROFILES_DIR = DBT_PROFILES_DIR
 DBT_TARGET = "dev"   # dbt target name
 EDR_ENV = "dev"      # Elementary environment label
 
+def _dbt_env():
+    overrides = {
+        "CREDENTIALS_PATH": os.getenv("CREDENTIALS_PATH", ""),
+        "PROJECT_ID": os.getenv("PROJECT_ID", ""),
+        "ELEMENTARY_DATASET_NAME": os.getenv("ELEMENTARY_DATASET_NAME", ""),
+        "STAGING_DATASET_NAME": os.getenv("STAGING_DATASET_NAME", ""),
+        "SNAPSHOT_DATASET_NAME": os.getenv("SNAPSHOT_DATASET_NAME", ""),
+        "RAW_DATASET_NAME": os.getenv("RAW_DATASET_NAME", ""),
+    }
+    return {**os.environ, **{k: v for k, v in overrides.items() if v}}
+
 def _run(cmd: str, logger=None, *, env: dict | None = None, cwd: str | None = None):
     """Run shell command and raise with full stdout/stderr on failure."""
-    if env is None:
-        env = os.environ.copy()
+    env = _dbt_env()
 
     if logger:
         logger.info(f"Running: {cmd}")

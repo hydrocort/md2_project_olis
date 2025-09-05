@@ -11,4 +11,5 @@
 }}
 SELECT *
 FROM {{ source(env_var('RAW_DATASET_NAME'), 'product_category_name_translation') }}  
+WHERE product_category_name IS NOT NULL
 {% endsnapshot %}

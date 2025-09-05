@@ -16,4 +16,5 @@
 }}
 SELECT *
 FROM {{ source(env_var('RAW_DATASET_NAME'), 'order_reviews') }}
+WHERE review_id IS NOT NULL AND order_id IS NOT NULL
 {% endsnapshot %}

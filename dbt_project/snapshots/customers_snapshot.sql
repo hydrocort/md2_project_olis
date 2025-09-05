@@ -9,4 +9,5 @@
 }}
 SELECT *
 FROM {{ source(env_var('RAW_DATASET_NAME'), 'customers') }} 
+WHERE customer_id IS NOT NULL
 {% endsnapshot %}
