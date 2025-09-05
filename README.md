@@ -25,7 +25,7 @@
 ### Successful Dagster UI
 Below is an example screenshot of a healthy `full_pipeline` job graph after `dagster dev` starts successfully:
 
-![Dagster full_pipeline success](docs/screenshot_full_pipeline2.png)
+![Dagster full_pipeline success](docs/screenshot_dagster.png)
 
 ### Elementary Dashboard
 ![Elementary Dashboard](docs/screenshot_elementary.png)
