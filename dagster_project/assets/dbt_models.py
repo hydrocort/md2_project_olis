@@ -17,7 +17,7 @@ def _dbt_env():
     return {**os.environ, **{k: v for k, v in overrides.items() if v}}
 
 
-@asset(deps=[meltano_ingestion], group_name="Transformation")
+@asset(deps=[meltano_ingestion], compute_kind="dbt", group_name="Transformation")
 def dbt_snapshot(context):
     """Run dbt snapshot."""
     env = _dbt_env()
@@ -29,7 +29,7 @@ def dbt_snapshot(context):
         context.log.error(f"dbt snapshot errors:\n{result.stderr}")
         raise Exception(f"dbt snapshot failed with exit code {result.returncode}")
     
-@asset(deps=[dbt_snapshot], group_name="Transformation")
+@asset(deps=[dbt_snapshot], compute_kind="dbt", group_name="Transformation")
 def dbt_seed(context):
     """Run dbt seed."""
     env = _dbt_env()
@@ -41,7 +41,7 @@ def dbt_seed(context):
         context.log.error(f"dbt seed errors:\n{result.stderr}")
         raise Exception(f"dbt seed failed with exit code {result.returncode}")
 
-@asset(deps=[dbt_seed], group_name="Transformation")
+@asset(deps=[dbt_seed], compute_kind="dbt", group_name="Transformation")
 def dbt_run(context):
     """Run dbt run."""
     env = _dbt_env()
@@ -53,7 +53,7 @@ def dbt_run(context):
         context.log.error(f"dbt run errors:\n{result.stderr}")
         raise Exception(f"dbt run failed with exit code {result.returncode}")
 
-@asset(deps=[dbt_run], group_name="Transformation")
+@asset(deps=[dbt_run], compute_kind="dbt", group_name="Transformation")
 def dbt_test(context):
     """Run dbt test."""
     env = _dbt_env()

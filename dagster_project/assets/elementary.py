@@ -39,8 +39,9 @@ def _run(cmd: str, logger=None, *, env: dict | None = None, cwd: str | None = No
         )
 
 
-@asset(name="dbt_elementary_build", deps=[AssetKey("dbt_test")], compute_kind="dbt", group_name="Elementary")
+@asset(name="dbt_elementary_build", deps=[AssetKey("dbt_test")], compute_kind="dbt", group_name="Data_Quality")
 def dbt_elementary_build(context):
+    """Run dbt commands to build Elementary models and tests."""
     _run(f"dbt deps --project-dir {DBT_PROJECT_DIR}", context.log)
 
     # Build Elementary package models into ELEMENTARY_DATASET_NAME
@@ -58,8 +59,9 @@ def dbt_elementary_build(context):
     )
 
 
-@asset(name="elementary_monitor", deps=[AssetKey("dbt_elementary_build")], compute_kind="cli", group_name="Elementary")
+@asset(name="elementary_monitor", deps=[AssetKey("dbt_elementary_build")], compute_kind="cli", group_name="Data_Quality")
 def elementary_monitor(context):
+    """Run Elementary data quality monitoring and send alerts to Slack/Teams."""
     slack_webhook = os.getenv("SLACK_WEBHOOK_URL")
     slack_token = os.getenv("SLACK_BOT_TOKEN")
     slack_channel = os.getenv("SLACK_CHANNEL_NAME")  # e.g. "#data-alerts"
@@ -83,8 +85,9 @@ def elementary_monitor(context):
 
 
 
-@asset(name="elementary_report", deps=[AssetKey("dbt_elementary_build")], compute_kind="cli", group_name="Elementary")
+@asset(name="elementary_report", deps=[AssetKey("dbt_elementary_build")], compute_kind="cli", group_name="Data_Quality")
 def elementary_report(context):
+    """Generate Elementary data quality report as HTML."""
     Path(REPORT_PATH).parent.mkdir(parents=True, exist_ok=True)
     _run(
         f"edr report --project-dir {DBT_PROJECT_DIR} "
