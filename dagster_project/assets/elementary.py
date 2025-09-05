@@ -3,7 +3,10 @@ import os, subprocess
 from pathlib import Path
 from dagster import asset, MaterializeResult, MetadataValue, AssetKey
 
-DBT_PROJECT_DIR = "/home/gendaff/sctp_project/md2_project_olis/dbt_project"
+# Go up one level from the dbt_project folder
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DBT_PROJECT_DIR = os.path.join(PROJECT_ROOT, "dbt_project")
+REPORT_PATH = os.path.join(PROJECT_ROOT, "artifacts", "elementary_report.html")
 
 # If profiles.yml is in ~/.dbt, set this instead:
 # DBT_PROFILES_DIR = os.path.expanduser("~/.dbt")
@@ -13,9 +16,6 @@ ELEMENTARY_PROFILES_DIR = DBT_PROFILES_DIR
 # matches your profiles.yml
 DBT_TARGET = "dev"   # dbt target name
 EDR_ENV = "dev"      # Elementary environment label
-
-REPORT_PATH = "/home/gendaff/sctp_project/md2_project_olis/artifacts/elementary_report.html"
-
 
 def _run(cmd: str, logger=None, *, env: dict | None = None, cwd: str | None = None):
     """Run shell command and raise with full stdout/stderr on failure."""
