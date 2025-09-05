@@ -13,4 +13,5 @@
 }}
 SELECT *
 FROM {{ source(env_var('RAW_DATASET_NAME'), 'sellers') }} 
+WHERE seller_id IS NOT NULL
 {% endsnapshot %}

@@ -10,6 +10,7 @@ def _dbt_env():
     overrides = {
         "CREDENTIALS_PATH": os.getenv("CREDENTIALS_PATH", ""),
         "PROJECT_ID": os.getenv("PROJECT_ID", ""),
+        "ELEMENTARY_DATASET_NAME": os.getenv("ELEMENTARY_DATASET_NAME", ""),
         "STAGING_DATASET_NAME": os.getenv("STAGING_DATASET_NAME", ""),
         "SNAPSHOT_DATASET_NAME": os.getenv("SNAPSHOT_DATASET_NAME", ""),
         "RAW_DATASET_NAME": os.getenv("RAW_DATASET_NAME", ""),

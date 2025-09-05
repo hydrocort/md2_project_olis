@@ -52,3 +52,5 @@ tmp*/
 package-lock.yml
 dbt_packages/
 dbt_project/.user_id
+meltano_project/data/*_cleaned.csv
+artifacts/*

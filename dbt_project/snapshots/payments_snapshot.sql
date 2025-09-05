@@ -13,4 +13,5 @@
 }}
 SELECT *
 FROM {{ source(env_var('RAW_DATASET_NAME'), 'payments') }}
+WHERE order_id IS NOT NULL AND payment_sequential IS NOT NULL
 {% endsnapshot %}

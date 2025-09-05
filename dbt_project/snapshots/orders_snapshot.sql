@@ -9,4 +9,5 @@
 }}
 SELECT *
 FROM {{ source(env_var('RAW_DATASET_NAME'), 'orders') }}
+WHERE order_id IS NOT NULL
 {% endsnapshot %}

@@ -18,4 +18,5 @@
 }}
 SELECT *
 FROM {{ source(env_var('RAW_DATASET_NAME'), 'products') }} 
+WHERE product_id IS NOT NULL
 {% endsnapshot %}
