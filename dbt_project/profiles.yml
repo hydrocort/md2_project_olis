@@ -10,3 +10,15 @@ md2_project_olis:
       location: US
       threads: 1
       keyfile: "{{ env_var('CREDENTIALS_PATH') }}"
+
+elementary:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      keyfile: "{{ env_var('CREDENTIALS_PATH') }}"
+      project: "{{ env_var('PROJECT_ID') }}"
+      dataset: "{{ env_var('ELEMENTARY_DATASET_NAME') }}"
+      location: US
+      threads: 4

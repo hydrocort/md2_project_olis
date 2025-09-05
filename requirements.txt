@@ -7,6 +7,7 @@ dagster-dbt==0.24.11
 
 # dbt adapter for BigQuery (with dbt-core)
 dbt-bigquery==1.8.2
+elementary-data==0.19.4
 
 # Google Cloud + SQL
 google-cloud-bigquery
@@ -20,3 +21,6 @@ great-expectations
 
 # Ingestion
 meltano
+
+# Useful helpers
+python-dotenv>=1.0,<2.0

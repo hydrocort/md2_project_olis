@@ -7,7 +7,7 @@ with source as (
         safe_cast(trim(shipping_limit_date) as timestamp) as shipping_limit_date,
         safe_cast(trim(price) as numeric) as price,
         safe_cast(trim(freight_value) as numeric) as freight_value
-    from {{ source(env_var('RAW_DATASET_NAME'), 'order_items') }}
+    from {{ ref('order_items_snapshot') }}
     where order_id is not null
 )
 

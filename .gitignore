@@ -51,3 +51,4 @@ tmp*/
 .user.yml
 package-lock.yml
 dbt_packages/
+dbt_project/.user_id

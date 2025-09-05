@@ -1,12 +1,13 @@
 
 name: "md2_project_olis"
-version: "1.0.0"
 profile: "md2_project_olis"
+version: "1.0.0"
 config-version: 2
 
 model-paths: ["models"]
 target-path: "target"
 clean-targets: ["target"]
+snapshot-paths: ["snapshots"]
 
 models:
   md2_project_olis:
