@@ -17,11 +17,55 @@ def _dbt_env():
     }
     return {**os.environ, **{k: v for k, v in overrides.items() if v}}
 
+# run sql commands to delete table in raw dataset, if id is null
+def _cleanup_raw_data():
+    from google.cloud import bigquery
+    client = bigquery.Client()
+    query = f"""
+    DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.customers`
+    WHERE customer_id IS NULL
+    """
+    query_job = client.query(query)
+    query_job.result()
+
+    query = f"""
+    DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.order_items`
+    WHERE order_id IS NULL
+    """
+    query_job = client.query(query)
+    query_job.result()
+    print(f"Deleted {query_job.num_dml_affected_rows} rows from raw order_items table.")
+
+    query = f"""
+    DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.orders`
+    WHERE order_id IS NULL
+    """
+    query_job = client.query(query)
+    query_job.result()
+    print(f"Deleted {query_job.num_dml_affected_rows} rows from raw orders table.")
+
+    query = f"""
+    DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.products`
+    WHERE product_id IS NULL
+    """
+    query_job = client.query(query)
+    query_job.result()
+    print(f"Deleted {query_job.num_dml_affected_rows} rows from raw products table.")
+
+    query = f"""
+    DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.sellers`
+    WHERE seller_id IS NULL
+    """
+    query_job = client.query(query)
+    query_job.result()
+    print(f"Deleted {query_job.num_dml_affected_rows} rows from raw sellers table.")
+
 
 @asset(deps=[meltano_ingestion], compute_kind="dbt", group_name="Transformation")
 def dbt_snapshot(context):
     """Run dbt snapshot."""
     env = _dbt_env()
+    _cleanup_raw_data()
     context.log.info("Running dbt snapshot as a single materialization step")
     result = subprocess.run(["dbt", "snapshot"], cwd=DBT_PROJECT_DIR, check=False, env=env, capture_output=True, text=True)
     context.log.info(f"dbt snapshot output: {result.stdout}")
