@@ -11,19 +11,27 @@
 7) `cd meltano_project`
 8) `meltano lock --update --all`
 9) `cd ../dbt_project`
-10) `dbt deps`
-11) Go to project root `cd ..`
-12) Start Dagster UI: `dagster dev`
-13) Click full_pipeline -> Materialize All
-14) To run streamlit, open a new terminal and change into streamlit directory, `cd streamlit_dashboard`
-15) `conda activate olisenv`
-16) `streamlit run streamlit_app.py`
+10) `dbt clean`
+11) `dbt deps`
+12) Go to project root `cd ..`
+13) Start Dagster UI: `dagster dev`
+14) Click `full_pipeline` -> `Materialize All`
+15) To view elementary dashboard, find the file "elementary_report.html" in the "artifacts" directory, open it with your browser, (below illustration)
+16) You can also open with your chrome, with your project path, `file://wsl.localhost/Ubuntu/home/gendaff/sctp_project/md2_project_olis/artifacts/elementary_report.html`  
+15) To run streamlit, open a new terminal and change into streamlit directory, `cd streamlit_dashboard`
+16) `conda activate olisenv`
+17) `streamlit run streamlit_app.py`
 
 ### Successful Dagster UI
 Below is an example screenshot of a healthy `full_pipeline` job graph after `dagster dev` starts successfully:
 
 ![Dagster full_pipeline success](docs/screenshot_full_pipeline2.png)
 
+### Elementary Dashboard
+![Elementary Dashboard](docs/screenshot_elementary.png)
+
+### Elementary Lineage
+![Elementary Dashboard Lineage](docs/screenshot_ele_tables.png)
 
 ## Structure
 - `dagster_project/` Dagster assets/resources/jobs/schedules
@@ -41,11 +49,3 @@ If `conda install` fails due to missing packages, run the following commands to 
 conda config --add channels conda-forge
 conda config --set channel_priority strict
 ```
-
-If you see `the dagster-webserver python package must be installed`:
-1. Make sure the correct env is active: `conda activate olisenv` (or your env name).
-2. Verify install: `pip show dagster-webserver` (should list a version like 1.8.12).
-3. If missing, install (matching dagster version): `pip install "dagster-webserver==$(python -c 'import dagster;print(dagster.__version__)')"`.
-4. Launch UI: `dagster dev` (or `python -m dagster dev`).
-5. Still failing? Check that `which dagster` points inside your env (e.g. `.../envs/olisenv/bin/dagster`). If not, reactivate the env or open a new shell.
-

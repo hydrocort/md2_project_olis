@@ -4,3 +4,4 @@ CREDENTIALS_PATH=your_credentials_path.json
 RAW_DATASET_NAME=olis_raw_dataset
 STAGING_DATASET_NAME=olis_dataset
 MARTS_DATASET_NAME=olis_dataset
+ELEMENTARY_DATASET_NAME=olis_dataset_elementary

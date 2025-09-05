@@ -13,4 +13,3 @@ sources:
       - name: order_reviews
       - name: product_category_name_translation
       - name: geolocation
-

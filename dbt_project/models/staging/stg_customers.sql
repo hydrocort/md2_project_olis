@@ -5,7 +5,7 @@ with source as (
         trim(lower(customer_city)) as customer_city,
         upper(trim(customer_state)) as customer_state,
         trim(customer_zip_code_prefix) as customer_zip_prefix,
-    from {{ source(env_var('RAW_DATASET_NAME'), 'customers') }} 
+    from {{ ref('customers_snapshot') }} 
     where customer_id is not null
 )
 

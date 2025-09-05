@@ -5,7 +5,7 @@ import subprocess
 import os
 from pathlib import Path
 
-@asset
+@asset(group_name="Ingestion")
 def meltano_ingestion(context):
     """Run Meltano ingestion (tap-csv -> target-bigquery)."""
     project_dir = Path("meltano_project")
@@ -37,12 +37,17 @@ def meltano_ingestion(context):
         os.replace(tmp, csv_file)
 
     try:
-        subprocess.run(
+        result = subprocess.run(
             ["meltano", "run", "tap-csv", "target-bigquery"],
             cwd=project_dir,
             check=True,
+            capture_output=True,
+            text=True,
         )
-        context.log.info("Meltano ingestion complete ✅")
+        context.log.info(f"Meltano output: {result.stdout}")
+        context.log.error(f"Meltano errors: {result.stderr}")
     except subprocess.CalledProcessError as e:
+        context.log.error(f"Meltano failed with output: {e.stdout}")
+        context.log.error(f"Meltano failed with errors: {e.stderr}")
         raise Exception(f"Meltano ingestion failed: {e}")
     return "bigquery_staging_loaded"

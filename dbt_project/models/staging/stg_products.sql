@@ -25,7 +25,7 @@ with source as (
             ELSE 0.0
         END as product_volume_cm3
 
-    from  {{ source(env_var('RAW_DATASET_NAME'), 'products') }} prds
+    from  {{ ref('products_snapshot') }} prds
     where product_id is not null
 
 )

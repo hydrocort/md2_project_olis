@@ -28,3 +28,4 @@ dependencies:
       - pyarrow
       - toml
       - python-dotenv
+      - elementary-data==0.19.4

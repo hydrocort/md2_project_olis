@@ -54,3 +54,4 @@ plugins:
       add_metadata_columns: false
       batch_size: 100000
       timeout: 1200
+      overwrite: true
