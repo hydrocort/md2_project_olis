@@ -27,6 +27,7 @@ def _cleanup_raw_data():
     """
     query_job = client.query(query)
     query_job.result()
+    print(f"Deleted {query_job.num_dml_affected_rows} rows from raw customers table.")
 
     query = f"""
     DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.order_items`
