@@ -14,7 +14,7 @@ WITH product_base AS (
     product_description_length,
     
     -- Calculated volume (already calculated in staging)
-   -- product_volume_cm3
+    product_volume_cm3
     
   FROM {{ ref('stg_products') }}
   WHERE product_id IS NOT NULL

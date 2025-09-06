@@ -761,6 +761,54 @@ def main():
                     freq_chart.update_xaxes(type='category')
                     
                     st.plotly_chart(freq_chart, width="stretch")
+                    
+                    # Interactive Purchase Frequency Details Table
+                    st.markdown("**Purchase Frequency Details**")
+                    
+                    # Get available order counts and find the one with highest customer count
+                    available_orders = frequency_data['order_count'].tolist()
+                    default_order = frequency_data.loc[frequency_data['customer_count'].idxmax(), 'order_count']
+                    
+                    # Create dropdown selector
+                    col1, col2 = st.columns([2, 3])
+                    with col1:
+                        selected_order_count = st.selectbox(
+                            "Select Number of Orders to View Details:",
+                            options=available_orders,
+                            index=available_orders.index(default_order),
+                            help="Choose an order count to see detailed customer information"
+                        )
+                    
+                    with col2:
+                        st.markdown(f"**Showing details for customers with {selected_order_count} order{'s' if selected_order_count != 1 else ''}**")
+                    
+                    # Filter data for selected order count
+                    selected_data = frequency_data[frequency_data['order_count'] == selected_order_count]
+                    
+                    # Display the table
+                    if not selected_data.empty:
+                        display_freq_data = selected_data.copy()
+                        display_freq_data['customer_count'] = display_freq_data['customer_count'].apply(lambda x: f"{x:,}")
+                        display_freq_data['avg_customer_value'] = display_freq_data['avg_customer_value'].apply(lambda x: f"${x:.2f}")
+                        display_freq_data['total_segment_value'] = display_freq_data['total_segment_value'].apply(lambda x: f"${x:,.2f}")
+                        display_freq_data['percentage_of_customers'] = display_freq_data['percentage_of_customers'].apply(lambda x: f"{x}%")
+                        
+                        # Rename columns for display
+                        display_columns = {
+                            'order_count': 'Number of Orders',
+                            'customer_count': 'Customer Count', 
+                            'percentage_of_customers': 'Percentage',
+                            'avg_customer_value': 'Avg Customer Value',
+                            'total_segment_value': 'Total Segment Value'
+                        }
+                        
+                        st.dataframe(
+                            display_freq_data[list(display_columns.keys())].rename(columns=display_columns),
+                            width="stretch",
+                            hide_index=True
+                        )
+                    else:
+                        st.info(f"No data available for {selected_order_count} orders")
                 
                 # Data tables
                 st.subheader("Regional Behavior Summary")

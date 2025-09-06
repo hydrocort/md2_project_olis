@@ -2,11 +2,11 @@ with source as (
     select
         trim(review_id) as review_id,
         trim(order_id) as order_id,
-        safe_cast(trim(review_score) as int64) as review_score,
+        COALESCE(SAFE_CAST(NULLIF(trim(review_score), '') AS INT64), 0) as review_score,
         trim(review_comment_title) as review_comment_title,
         trim(review_comment_message) as review_comment_message,
-        safe_cast(trim(review_creation_date) as timestamp) as review_creation_date,
-        safe_cast(trim(review_answer_timestamp) as timestamp) as review_answer_timestamp
+        SAFE_CAST(NULLIF(trim(review_creation_date), '') AS timestamp) as review_creation_date,
+        SAFE_CAST(NULLIF(trim(review_answer_timestamp), '') AS timestamp) as review_answer_timestamp
     from {{ ref('order_reviews_snapshot') }}
     where review_id is not null
 )

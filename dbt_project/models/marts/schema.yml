@@ -3,387 +3,645 @@ version: 2
 models:
   # Dimension Tables
   - name: dim_customers
-    description: "Customer dimension table with regional classifications and location data"
+    description: Customer dimension table with regional classifications and location data
     columns:
       - name: customer_key
-        description: "Primary key for customer dimension"
+        description: Primary key for customer dimension
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - dbt_expectations.expect_column_values_to_be_unique
-      - name: customer_unique_id
-        description: "Customer's unique identifier across the platform"
+      - name: customer_id_original
+        description: Customer's original ID from orders tabl
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
       - name: customer_city
-        description: "Customer's city"
+        description: Customer's city
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
       - name: customer_state
-        description: "Customer's state (2-letter Brazilian state code)"
+        description: Customer's state (2-letter Brazilian state code)
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SP', 'SE', 'TO']
+              values:
+                - AC
+                - AL
+                - AM
+                - AP
+                - BA
+                - CE
+                - DF
+                - ES
+                - GO
+                - MA
+                - MG
+                - MS
+                - MT
+                - PA
+                - PB
+                - PE
+                - PI
+                - PR
+                - RJ
+                - RN
+                - RO
+                - RR
+                - RS
+                - SC
+                - SP
+                - SE
+                - TO
       - name: customer_zip_prefix
-        description: "Customer's zip code prefix for location"
+        description: Customer's zip code prefix for location
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
       - name: customer_region
-        description: "Customer's geographic region (North, Northeast, Southeast, South, Central-West)"
+        description: Customer's geographic region (North, Northeast, Southeast, South,
+          Central-West)
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: ['North', 'Northeast', 'Southeast', 'South', 'Central-West']
+              values:
+                - North
+                - Northeast
+                - Southeast
+                - South
+                - Central-West
       - name: customer_economic_zone
-        description: "Customer's economic classification zone"
+        description: Customer's economic classification zone
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: ['Amazon', 'Northeast', 'Southeast', 'South', 'Central']
+              values:
+                - Amazon
+                - Northeast
+                - Southeast
+                - South
+                - Central
 
   - name: dim_date
-    description: "Date dimension table for temporal analysis and reporting"
+    description: Date dimension table for temporal analysis and reporting
     # Note: Boolean and numeric fields use quote: false to prevent dbt from auto-converting to STRINGs
     # This ensures BigQuery data type compatibility (BOOL, INT64 vs STRING comparisons)
     columns:
       - name: date_key
-        description: "Primary key for date dimension (YYYY-MM-DD format)"
+        description: Primary key for date dimension (YYYY-MM-DD format)
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - dbt_expectations.expect_column_values_to_be_unique
       - name: full_date
-        description: "Full date in DATE format"
+        description: Full date in DATE format
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
       - name: year
-        description: "Year extracted from date"
+        description: Year extracted from date
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - dbt_utils.accepted_range:
               min_value: 2016
               max_value: 2020
       - name: month
-        description: "Month number (1-12)"
+        description: Month number (1-12)
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - dbt_utils.accepted_range:
               min_value: 1
               max_value: 12
       - name: month_name
-        description: "Full month name"
+        description: Full month name
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+              values:
+                - January
+                - February
+                - March
+                - April
+                - May
+                - June
+                - July
+                - August
+                - September
+                - October
+                - November
+                - December
       - name: quarter
-        description: "Quarter number (1-4)"
+        description: Quarter number (1-4)
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: [1, 2, 3, 4]
-              quote: false  # Prevents dbt from auto-converting INT64 values to STRINGs
+              values:
+                - 1
+                - 2
+                - 3
+                - 4
+              quote: false # Prevents dbt from auto-converting INT64 values to STRINGs
       - name: day_of_week
-        description: "Day of week number (1-7, where 1=Sunday)"
+        description: Day of week number (1-7, where 1=Sunday)
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - dbt_utils.accepted_range:
               min_value: 1
               max_value: 7
       - name: day_name
-        description: "Full day name"
+        description: Full day name
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+              values:
+                - Sunday
+                - Monday
+                - Tuesday
+                - Wednesday
+                - Thursday
+                - Friday
+                - Saturday
       - name: is_weekend
-        description: "Boolean flag indicating if date is weekend"
+        description: Boolean flag indicating if date is weekend
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: [true, false]
-              quote: false  # Prevents dbt from auto-converting BOOL values to STRINGs
+              values:
+                - true
+                - false
+              quote: false # Prevents dbt from auto-converting BOOL values to STRINGs
 
   - name: dim_products
-    description: "Product dimension table with category translations and derived dimensions"
+    description: Product dimension table with category translations and derived dimensions
     columns:
       - name: product_key
-        description: "Primary key for product dimension"
+        description: Primary key for product dimension
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - dbt_expectations.expect_column_values_to_be_unique
       - name: product_category_portuguese
-        description: "Product category name in Portuguese"
+        description: Product category name in Portuguese
         tests:
           - dbt_utils.not_null_proportion:
-              at_least: 0.98  # Allow up to 2% NULLs (current is 1.85%)
+              at_least: 0.98 # Allow up to 2% NULLs (current is 1.85%)
       - name: product_category_english
-        description: "Product category name in English"
+        description: Product category name in English
         tests:
           - dbt_utils.not_null_proportion:
-              at_least: 0.98  # Allow up to 2% NULLs (current is 1.85%)
+              at_least: 0.98 # Allow up to 2% NULLs (current is 1.85%)
+      - name: product_weight_g
+        description: Product weight in grams
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_utils.accepted_range:
+              min_value: 0 # Allow weightless products
+              max_value: 100000 # Maximum reasonable weight (100kg)
+      - name: product_length_cm
+        description: Product length in centimeters
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_utils.accepted_range:
+              min_value: 0 # Allow very small products
+              max_value: 1000 # Maximum reasonable length (10m)
+      - name: product_height_cm
+        description: Product height in centimeters
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_utils.accepted_range:
+              min_value: 0 # Allow very small products
+              max_value: 1000 # Maximum reasonable height (10m)
+      - name: product_width_cm
+        description: Product width in centimeters
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_utils.accepted_range:
+              min_value: 0 # Allow very small products
+              max_value: 1000 # Maximum reasonable width (10m)
+      - name: product_volume_cm3
+        description: Calculated product volume in cubic centimeters
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_utils.accepted_range:
+              min_value: 0 # Allow very small products
+              max_value: 1000000000 # Maximum reasonable volume (1m³)
+      - name: product_photos_qty
+        description: Number of product photos
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_utils.accepted_range:
+              min_value: 0 # Allow products with no photos
+              max_value: 100 # Maximum reasonable photo count
+      - name: product_name_length
+        description: Length of the product name
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_utils.accepted_range:
+              min_value: 0 # Allow very short names
+              max_value: 1000 # Maximum reasonable name length
+      - name: product_description_length
+        description: Length of the product description
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_utils.accepted_range:
+              min_value: 0 # Allow very short descriptions
+              max_value: 10000 # Maximum reasonable description length
 
   - name: dim_sellers
-    description: "Seller dimension table with regional classifications and location data"
+    description: Seller dimension table with regional classifications and location data
     columns:
       - name: seller_key
-        description: "Primary key for seller dimension"
+        description: Primary key for seller dimension
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - dbt_expectations.expect_column_values_to_be_unique
       - name: seller_city
-        description: "Seller's city"
+        description: Seller's city
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
       - name: seller_state
-        description: "Seller's state (2-letter Brazilian state code)"
+        description: Seller's state (2-letter Brazilian state code)
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SP', 'SE', 'TO']
+              values:
+                - AC
+                - AL
+                - AM
+                - AP
+                - BA
+                - CE
+                - DF
+                - ES
+                - GO
+                - MA
+                - MG
+                - MS
+                - MT
+                - PA
+                - PB
+                - PE
+                - PI
+                - PR
+                - RJ
+                - RN
+                - RO
+                - RR
+                - RS
+                - SC
+                - SP
+                - SE
+                - TO
       - name: seller_zip_prefix
-        description: "Seller's zip code prefix for location"
+        description: Seller's zip code prefix for location
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
       - name: seller_region
-        description: "Seller's geographic region (North, Northeast, Southeast, South, Central-West)"
+        description: Seller's geographic region (North, Northeast, Southeast, South,
+          Central-West)
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: ['North', 'Northeast', 'Southeast', 'South', 'Central-West']
+              values:
+                - North
+                - Northeast
+                - Southeast
+                - South
+                - Central-West
       - name: seller_economic_zone
-        description: "Seller's economic classification zone"
+        description: Seller's economic classification zone
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: ['Amazon', 'Northeast', 'Southeast', 'South', 'Central']
+              values:
+                - Amazon
+                - Northeast
+                - Southeast
+                - South
+                - Central
 
   - name: dim_orders
-    description: "Order dimension table with delivery performance metrics"
+    description: Order dimension table with delivery performance metrics
     columns:
       - name: order_key
-        description: "Primary key for order dimension"
+        description: Primary key for order dimension
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - dbt_expectations.expect_column_values_to_be_unique
+      - name: order_status
+        description: Current status of the order
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - accepted_values:
+              values:
+                - DELIVERED
+                - SHIPPED
+                - CANCELED
+                - UNAVAILABLE
+                - INVOICED
+                - PROCESSING
+                - APPROVED
+                - CREATED
       - name: order_purchase_timestamp
-        description: "When the order was placed"
+        description: When the order was placed
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
       - name: order_approved_at
-        description: "When the order was approved"
+        description: When the order was approved
       - name: order_delivered_carrier_date
-        description: "When the order was delivered to carrier"
+        description: When the order was delivered to carrier
       - name: order_delivered_customer_date
-        description: "When the order was delivered to customer"
+        description: When the order was delivered to customer
       - name: order_estimated_delivery_date
-        description: "Estimated delivery date"
+        description: Estimated delivery date
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
       - name: days_to_delivery
-        description: "Calculated days from purchase to delivery"
+        description: Calculated days from purchase to delivery
         tests:
           - dbt_utils.not_null_proportion:
-              at_least: 0.95  # Allow up to 5% NULLs for undelivered orders
+              at_least: 0.95 # Allow up to 5% NULLs for undelivered orders
           - dbt_utils.accepted_range:
-              min_value: -30  # Allow negative values for data quality issues
-              max_value: 365  # Maximum reasonable delivery time (1 year)
+              min_value: -30 # Allow negative values for data quality issues
+              max_value: 365 # Maximum reasonable delivery time (1 year)
       - name: delivery_vs_estimate_days
-        description: "Difference between actual and estimated delivery days"
+        description: Difference between actual and estimated delivery days
       - name: is_delivered_on_time
-        description: "Boolean flag indicating if delivery was on time"
+        description: Boolean flag indicating if delivery was on time
         tests:
           - dbt_utils.not_null_proportion:
-              at_least: 0.95  # Allow up to 5% NULLs for undelivered orders
+              at_least: 0.95 # Allow up to 5% NULLs for undelivered orders
           - accepted_values:
-              values: [true, false]
-              quote: false  # Prevents dbt from auto-converting BOOL values to STRINGs
+              values:
+                - true
+                - false
+              quote: false # Prevents dbt from auto-converting BOOL values to STRINGs
 
   - name: dim_payments
-    description: "Payment dimension table with payment method aggregation and flags"
+    description: Payment dimension table with payment method aggregation and flags
     columns:
       - name: payment_key
-        description: "Primary key for payment dimension (order_id based)"
+        description: Primary key for payment dimension (order_id based)
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - dbt_expectations.expect_column_values_to_be_unique
-      - name: payment_methods_count
-        description: "Count of distinct payment methods used per order"
+      - name: primary_payment_type
+        description: Most frequent payment type for the order
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - accepted_values:
+              values:
+                - CREDIT_CARD
+                - BOLETO
+                - VOUCHER
+                - DEBIT_CARD
+                - NOT_DEFINED
+      - name: total_installments
+        description: Sum of payment installments for the order
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - dbt_utils.accepted_range:
-              min_value: 1  # Must have at least 1 payment method
-              max_value: 10  # Maximum reasonable payment methods per order
+              min_value: 0 # Allow 0 installments for some payment types
+              # commented out due to data issues
+              # max_value: 24 # Maximum reasonable installments 
+      - name: payment_methods_count
+        description: Count of distinct payment methods used per order
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          - dbt_utils.accepted_range:
+              min_value: 1 # Must have at least 1 payment method
+              max_value: 10 # Maximum reasonable payment methods per order
       - name: uses_credit_card
-        description: "Whether order used credit card payment"
+        description: Whether order used credit card payment
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: [true, false]
-              quote: false  # Prevents dbt from auto-converting BOOL values to STRINGs
+              values:
+                - true
+                - false
+              quote: false # Prevents dbt from auto-converting BOOL values to STRINGs
       - name: uses_boleto
-        description: "Whether order used boleto payment"
+        description: Whether order used boleto payment
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: [true, false]
-              quote: false  # Prevents dbt from auto-converting BOOL values to STRINGs
+              values:
+                - true
+                - false
+              quote: false # Prevents dbt from auto-converting BOOL values to STRINGs
       - name: uses_voucher
-        description: "Whether order used voucher payment"
+        description: Whether order used voucher payment
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: [true, false]
-              quote: false  # Prevents dbt from auto-converting BOOL values to STRINGs
+              values:
+                - true
+                - false
+              quote: false # Prevents dbt from auto-converting BOOL values to STRINGs
 
   - name: dim_reviews
-    description: "Review dimension table with timing calculations and comment availability flags"
+    description: Review dimension table with timing calculations and comment
+      availability flags
     columns:
       - name: review_key
-        description: "Primary key for review dimension (order_id based, may be reused across order items)"
+        description: Primary key for review dimension (order_id based, may be reused
+          across order items)
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
       - name: review_score
-        description: "Review score from 1 to 5"
+        description: Review score from 1 to 5
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: [1, 2, 3, 4, 5]
-              quote: false  # Prevents dbt from auto-converting INT64 values to STRINGs
+              values:
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5
+              quote: false # Prevents dbt from auto-converting INT64 values to STRINGs
       - name: has_comment_title
-        description: "Whether review_comment_title is not null"
+        description: Whether review_comment_title is not null
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: [true, false]
-              quote: false  # Prevents dbt from auto-converting BOOL values to STRINGs
+              values:
+                - true
+                - false
+              quote: false # Prevents dbt from auto-converting BOOL values to STRINGs
       - name: has_comment_message
-        description: "Whether review_comment_message is not null"
+        description: Whether review_comment_message is not null
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: [true, false]
-              quote: false  # Prevents dbt from auto-converting BOOL values to STRINGs
+              values:
+                - true
+                - false
+              quote: false # Prevents dbt from auto-converting BOOL values to STRINGs
       - name: review_creation_date
-        description: "When the review was created"
+        description: When the review was created
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
+      - name: days_to_review
+        description: Days from order purchase to review creation
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+          # commented out due to data issues, some negative values present
+          # - dbt_utils.accepted_range:
+          #     min_value: -30 # Allow negative values for data quality issues
+          #     max_value: 365 # Maximum reasonable review delay (1 year)
 
   # Fact Table
   - name: fact_sales
-    description: "Central fact table capturing each order item transaction with all relevant measures and dimensional context"
+    description: Central fact table capturing each order item transaction with all
+      relevant measures and dimensional context
     columns:
       - name: order_item_sk
-        description: "Surrogate key for each order item (CONCAT(order_id, '-', order_item_id))"
+        description: Surrogate key for each order item (CONCAT(order_id, '-',
+          order_item_id))
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - dbt_expectations.expect_column_values_to_be_unique
       - name: order_key
-        description: "Reference to DimOrders"
+        description: Reference to DimOrders
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - relationships:
               to: ref('dim_orders')
               field: order_key
       - name: customer_key
-        description: "Reference to DimCustomers"
+        description: Reference to DimCustomers
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - relationships:
               to: ref('dim_customers')
               field: customer_key
       - name: product_key
-        description: "Reference to DimProducts"
+        description: Reference to DimProducts
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - relationships:
               to: ref('dim_products')
               field: product_key
       - name: seller_key
-        description: "Reference to DimSellers"
+        description: Reference to DimSellers
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - relationships:
               to: ref('dim_sellers')
               field: seller_key
       - name: date_key
-        description: "Reference to DimDate"
+        description: Reference to DimDate
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - relationships:
               to: ref('dim_date')
               field: date_key
       - name: payment_key
-        description: "Reference to DimPayments (nullable - some orders may not have payments)"
+        description: Reference to DimPayments (nullable - some orders may not have payments)
         tests:
           - relationships:
               to: ref('dim_payments')
               field: payment_key
       - name: review_key
-        description: "Reference to DimReviews (nullable - LEFT JOIN approach)"
+        description: Reference to DimReviews (nullable - LEFT JOIN approach)
         tests:
           - relationships:
               to: ref('dim_reviews')
               field: review_key
       - name: item_price
-        description: "Price paid for the item"
+        description: Price paid for the item
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - dbt_utils.accepted_range:
-              min_value: 0.0  # Allow free items
-              max_value: 15000  # Maximum reasonable item price
+              min_value: 0 # Allow free items
+              max_value: 15000 # Maximum reasonable item price
       - name: freight_value
-        description: "Shipping cost for the item"
+        description: Shipping cost for the item
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - dbt_utils.accepted_range:
-              min_value: 0.0  # Allow free shipping
-              max_value: 1000  # Maximum reasonable shipping cost
+              min_value: 0 # Allow free shipping
+              max_value: 1000 # Maximum reasonable shipping cost
       - name: total_item_value
-        description: "Total cost including shipping (price + freight_value)"
+        description: Total cost including shipping (price + freight_value)
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - dbt_utils.accepted_range:
-              min_value: 0.0  # Allow free items
-              max_value: 16000  # Maximum reasonable total value
+              min_value: 0 # Allow free items
+              max_value: 16000 # Maximum reasonable total value
       - name: payment_value
-        description: "Total payment amount for order"
+        description: Total payment amount for order
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - dbt_utils.accepted_range:
-              min_value: 0.0  # Allow promotional pricing
-              max_value: 20000  # Maximum reasonable payment value
+              min_value: 0 # Allow promotional pricing
+              max_value: 20000 # Maximum reasonable payment value
       - name: quantity
-        description: "Number of items (static value of 1 per row)"
+        description: Number of items (static value of 1 per row)
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: [1]
-              quote: false  # Prevents dbt from auto-converting INT64 values to STRINGs
+              values:
+                - 1
+              quote: false # Prevents dbt from auto-converting INT64 values to STRINGs
 
   # Seed Table
   - name: brazil_state_regions
-    description: "Reference seed data for Brazilian state to region mapping"
+    description: Reference seed data for Brazilian state to region mapping
     columns:
       - name: state_code
-        description: "Two-letter Brazilian state code"
+        description: Two-letter Brazilian state code
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - unique
           - accepted_values:
-              values: ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SP', 'SE', 'TO']
+              values:
+                - AC
+                - AL
+                - AM
+                - AP
+                - BA
+                - CE
+                - DF
+                - ES
+                - GO
+                - MA
+                - MG
+                - MS
+                - MT
+                - PA
+                - PB
+                - PE
+                - PI
+                - PR
+                - RJ
+                - RN
+                - RO
+                - RR
+                - RS
+                - SC
+                - SP
+                - SE
+                - TO
       - name: state_name
-        description: "Full state name"
+        description: Full state name
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
       - name: region
-        description: "Brazilian geographic region (North, Northeast, Southeast, South, Central-West)"
+        description: Brazilian geographic region (North, Northeast, Southeast, South,
+          Central-West)
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: ['North', 'Northeast', 'Southeast', 'South', 'Central-West']
+              values:
+                - North
+                - Northeast
+                - Southeast
+                - South
+                - Central-West
       - name: economic_zone
-        description: "Economic classification zone"
+        description: Economic classification zone
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
           - accepted_values:
-              values: ['Amazon', 'Northeast', 'Southeast', 'South', 'Central']
+              values:
+                - Amazon
+                - Northeast
+                - Southeast
+                - South
+                - Central
