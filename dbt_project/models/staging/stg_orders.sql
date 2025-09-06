@@ -2,7 +2,7 @@ with source as (
     select
         trim(order_id) as order_id,
         trim(customer_id) as customer_id,
-        lower(trim(order_status)) as order_status,
+        upper(trim(order_status)) as order_status,
         safe_cast(trim(order_purchase_timestamp) as timestamp) as order_purchase_timestamp,
         safe_cast(trim(order_approved_at) as timestamp) as order_approved_at,
         safe_cast(trim(order_delivered_carrier_date) as timestamp) as order_delivered_carrier_date,

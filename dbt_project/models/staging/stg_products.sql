@@ -3,13 +3,13 @@ with source as (
     select
         trim(product_id) as product_id, 
         trim(product_category_name) as product_category_name,
-        SAFE_CAST(NULLIF(trim(product_name_lenght), '') AS INT64) as product_name_length,
-        SAFE_CAST(NULLIF(trim(product_description_lenght), '') AS INT64) as product_description_length,
-        SAFE_CAST(NULLIF(trim(product_photos_qty), '') AS INT64) as product_photos_qty,
-        SAFE_CAST(NULLIF(trim(product_weight_g), '') AS FLOAT64) as product_weight_g,
-        SAFE_CAST(NULLIF(trim(product_length_cm), '') AS FLOAT64) as product_length_cm,
-        SAFE_CAST(NULLIF(trim(product_height_cm), '') AS FLOAT64) as product_height_cm,
-        SAFE_CAST(NULLIF(trim(product_width_cm), '') AS FLOAT64) as product_width_cm,
+        COALESCE(SAFE_CAST(NULLIF(trim(product_name_lenght), '') AS INT64), 0) as product_name_length,
+        COALESCE(SAFE_CAST(NULLIF(trim(product_description_lenght), '') AS INT64), 0) as product_description_length,
+        COALESCE(SAFE_CAST(NULLIF(trim(product_photos_qty), '') AS INT64), 0) as product_photos_qty,
+        COALESCE(SAFE_CAST(NULLIF(trim(product_weight_g), '') AS FLOAT64), 0) as product_weight_g,
+        COALESCE(SAFE_CAST(NULLIF(trim(product_length_cm), '') AS FLOAT64), 0) as product_length_cm,
+        COALESCE(SAFE_CAST(NULLIF(trim(product_height_cm), '') AS FLOAT64), 0) as product_height_cm,
+        COALESCE(SAFE_CAST(NULLIF(trim(product_width_cm), '') AS FLOAT64), 0) as product_width_cm,
 
         -- Calculated volume (with null handling)
         CASE 
