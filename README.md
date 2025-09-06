@@ -22,15 +22,19 @@
 16) `conda activate olisenv`
 17) `streamlit run streamlit_app.py`
 
-### Successful Dagster UI
+## Extra installation, if you want the elementary report to auto popup browser after job run
+1) Install chromium on WSL `sudo apt install chromium-browser`
+2) To browse from terminal, open the filepath `xdg-open /home/gendaff/test_project/md2_project_olis/artifacts/elementary_report.html`
+
+## Successful Dagster UI
 Below is an example screenshot of a healthy `full_pipeline` job graph after `dagster dev` starts successfully:
 
 ![Dagster full_pipeline success](docs/screenshot_dagster.png)
 
-### Elementary Dashboard
+## Elementary Dashboard
 ![Elementary Dashboard](docs/screenshot_elementary.png)
 
-### Elementary Lineage
+## Elementary Lineage
 ![Elementary Dashboard Lineage](docs/screenshot_ele_tables.png)
 
 ## Structure
