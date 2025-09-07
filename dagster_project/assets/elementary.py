@@ -21,7 +21,6 @@ def _dbt_env():
     overrides = {
         "CREDENTIALS_PATH": os.getenv("CREDENTIALS_PATH", ""),
         "PROJECT_ID": os.getenv("PROJECT_ID", ""),
-        "ELEMENTARY_DATASET_NAME": os.getenv("ELEMENTARY_DATASET_NAME", ""),
         "STAGING_DATASET_NAME": os.getenv("STAGING_DATASET_NAME", ""),
         "SNAPSHOT_DATASET_NAME": os.getenv("SNAPSHOT_DATASET_NAME", ""),
         "RAW_DATASET_NAME": os.getenv("RAW_DATASET_NAME", ""),
@@ -54,7 +53,7 @@ def dbt_elementary_build(context):
     """Run dbt commands to build Elementary models and tests."""
     _run(f"dbt deps --project-dir {DBT_PROJECT_DIR}", context.log)
 
-    # Build Elementary package models into ELEMENTARY_DATASET_NAME
+    # Build Elementary package models into {{ STAGING_DATASET_NAME }}
     _run(
         f"dbt run --select elementary --full-refresh "
         f"--project-dir {DBT_PROJECT_DIR} --profiles-dir {DBT_PROFILES_DIR} "
