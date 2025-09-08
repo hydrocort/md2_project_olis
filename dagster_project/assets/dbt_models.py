@@ -19,7 +19,13 @@ def _dbt_env():
 # run sql commands to delete table in raw dataset, if id is null
 def _cleanup_raw_data():
     from google.cloud import bigquery
-    client = bigquery.Client()
+    credentials_path = os.getenv("CREDENTIALS_PATH")
+    if credentials_path:
+        from google.oauth2 import service_account
+        credentials = service_account.Credentials.from_service_account_file(credentials_path)
+        client = bigquery.Client(credentials=credentials)
+    else:
+        client = bigquery.Client()
     query = f"""
     DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.customers`
     WHERE customer_id IS NULL
