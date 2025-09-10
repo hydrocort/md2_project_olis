@@ -1,3 +1,9 @@
+{{ config(
+    partition_by={"field":"modified_at","data_type":"timestamp","granularity":"day"},
+    cluster_by=['customer_key'],
+    unique_key='customer_key'
+) }}
+
 WITH customer_base AS (
   SELECT
     -- Primary key (using customer_unique_id as the unique identifier)
@@ -9,11 +15,14 @@ WITH customer_base AS (
     -- Location data (cleaned from staging - should be consistent for each customer)
     ANY_VALUE(customer_city) as customer_city,
     ANY_VALUE(customer_state) as customer_state,
-    ANY_VALUE(customer_zip_prefix) as customer_zip_prefix
-    
+    ANY_VALUE(customer_zip_prefix) as customer_zip_prefix,
+    MAX(modified_at) as modified_at
+
   FROM {{ ref('stg_customers') }}
-  WHERE customer_id IS NOT NULL
-      AND customer_unique_id IS NOT NULL
+  {% if is_incremental() %}
+    where modified_at >
+      (select coalesce(max(modified_at), timestamp('1970-01-01')) from {{ this }})
+  {% endif %}
   GROUP BY customer_unique_id
 ),
 
@@ -34,4 +43,3 @@ customer_regions AS (
 )
 
 SELECT * FROM customer_regions
-ORDER BY customer_key

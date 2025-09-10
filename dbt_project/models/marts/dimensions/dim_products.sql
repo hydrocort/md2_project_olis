@@ -1,3 +1,8 @@
+{{ config(
+    partition_by={"field":"modified_at","data_type":"timestamp","granularity":"day"},
+    cluster_by=['product_key'],
+    unique_key='product_key'
+) }}
 WITH product_base AS (
   SELECT
     -- Primary key
@@ -14,10 +19,14 @@ WITH product_base AS (
     product_description_length,
     
     -- Calculated volume (already calculated in staging)
-    product_volume_cm3
+    product_volume_cm3,
+    modified_at
     
   FROM {{ ref('stg_products') }}
-  WHERE product_id IS NOT NULL
+  {% if is_incremental() %}
+    where modified_at >
+      (select coalesce(max(modified_at), timestamp('1970-01-01')) from {{ this }})
+  {% endif %}
 ),
 
 product_categories AS (
@@ -33,4 +42,3 @@ product_categories AS (
 )
 
 SELECT * FROM product_categories
-ORDER BY product_key

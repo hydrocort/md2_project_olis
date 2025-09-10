@@ -17,70 +17,57 @@ def _dbt_env():
     return {**os.environ, **{k: v for k, v in overrides.items() if v}}
 
 # run sql commands to delete table in raw dataset, if id is null
-def _cleanup_raw_data():
-    from google.cloud import bigquery
-    credentials_path = os.getenv("CREDENTIALS_PATH")
-    if credentials_path:
-        from google.oauth2 import service_account
-        credentials = service_account.Credentials.from_service_account_file(credentials_path)
-        client = bigquery.Client(credentials=credentials)
-    else:
-        client = bigquery.Client()
-    query = f"""
-    DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.customers`
-    WHERE customer_id IS NULL
-    """
-    query_job = client.query(query)
-    query_job.result()
-    print(f"Deleted {query_job.num_dml_affected_rows} rows from raw customers table.")
+# def _cleanup_raw_data():
+#     from google.cloud import bigquery
+#     credentials_path = os.getenv("CREDENTIALS_PATH")
+#     if credentials_path:
+#         from google.oauth2 import service_account
+#         credentials = service_account.Credentials.from_service_account_file(credentials_path)
+#         client = bigquery.Client(credentials=credentials)
+#     else:
+#         client = bigquery.Client()
+#     query = f"""
+#     DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.customers`
+#     WHERE customer_id IS NULL
+#     """
+#     query_job = client.query(query)
+#     query_job.result()
+#     print(f"Deleted {query_job.num_dml_affected_rows} rows from raw customers table.")
 
-    query = f"""
-    DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.order_items`
-    WHERE order_id IS NULL
-    """
-    query_job = client.query(query)
-    query_job.result()
-    print(f"Deleted {query_job.num_dml_affected_rows} rows from raw order_items table.")
+#     query = f"""
+#     DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.order_items`
+#     WHERE order_id IS NULL
+#     """
+#     query_job = client.query(query)
+#     query_job.result()
+#     print(f"Deleted {query_job.num_dml_affected_rows} rows from raw order_items table.")
 
-    query = f"""
-    DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.orders`
-    WHERE order_id IS NULL
-    """
-    query_job = client.query(query)
-    query_job.result()
-    print(f"Deleted {query_job.num_dml_affected_rows} rows from raw orders table.")
+#     query = f"""
+#     DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.orders`
+#     WHERE order_id IS NULL
+#     """
+#     query_job = client.query(query)
+#     query_job.result()
+#     print(f"Deleted {query_job.num_dml_affected_rows} rows from raw orders table.")
 
-    query = f"""
-    DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.products`
-    WHERE product_id IS NULL
-    """
-    query_job = client.query(query)
-    query_job.result()
-    print(f"Deleted {query_job.num_dml_affected_rows} rows from raw products table.")
+#     query = f"""
+#     DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.products`
+#     WHERE product_id IS NULL
+#     """
+#     query_job = client.query(query)
+#     query_job.result()
+#     print(f"Deleted {query_job.num_dml_affected_rows} rows from raw products table.")
 
-    query = f"""
-    DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.sellers`
-    WHERE seller_id IS NULL
-    """
-    query_job = client.query(query)
-    query_job.result()
-    print(f"Deleted {query_job.num_dml_affected_rows} rows from raw sellers table.")
+#     query = f"""
+#     DELETE FROM `{os.getenv("PROJECT_ID")}.{os.getenv("RAW_DATASET_NAME")}.sellers`
+#     WHERE seller_id IS NULL
+#     """
+#     query_job = client.query(query)
+#     query_job.result()
+#     print(f"Deleted {query_job.num_dml_affected_rows} rows from raw sellers table.")
 
-
+   
 @asset(deps=[meltano_ingestion], compute_kind="dbt", group_name="Transformation")
-def dbt_snapshot(context):
-    """Run dbt snapshot."""
-    env = _dbt_env()
-    _cleanup_raw_data()
-    context.log.info("Running dbt snapshot as a single materialization step")
-    result = subprocess.run(["dbt", "snapshot"], cwd=DBT_PROJECT_DIR, check=False, env=env, capture_output=True, text=True)
-    context.log.info(f"dbt snapshot output: {result.stdout}")
-    context.log.error(f"dbt snapshot errors: {result.stderr}")
-    if result.returncode != 0:
-        context.log.error(f"dbt snapshot errors:\n{result.stderr}")
-        raise Exception(f"dbt snapshot failed with exit code {result.returncode}")
-    
-@asset(deps=[dbt_snapshot], compute_kind="dbt", group_name="Transformation")
 def dbt_seed(context):
     """Run dbt seed."""
     env = _dbt_env()
@@ -93,18 +80,55 @@ def dbt_seed(context):
         raise Exception(f"dbt seed failed with exit code {result.returncode}")
 
 @asset(deps=[dbt_seed], compute_kind="dbt", group_name="Transformation")
-def dbt_run(context):
-    """Run dbt run."""
+def dbt_staging(context):
+    """Run dbt staging."""
     env = _dbt_env()
-    context.log.info("Running dbt run as a single materialization step")
-    result = subprocess.run(["dbt", "run"], cwd=DBT_PROJECT_DIR, check=False, env=env, capture_output=True, text=True)
-    context.log.info(f"dbt run output: {result.stdout}")
-    context.log.error(f"dbt run errors: {result.stderr}")
+    # _cleanup_raw_data()
+    context.log.info("Running dbt staging as a single materialization step")
+    result = subprocess.run(["dbt", "run", "-s", "staging"], cwd=DBT_PROJECT_DIR, check=False, env=env, capture_output=True, text=True)
+    context.log.info(f"dbt staging output: {result.stdout}")
+    context.log.error(f"dbt staging errors: {result.stderr}")
     if result.returncode != 0:
-        context.log.error(f"dbt run errors:\n{result.stderr}")
-        raise Exception(f"dbt run failed with exit code {result.returncode}")
+        context.log.error(f"dbt staging errors:\n{result.stderr}")
+        raise Exception(f"dbt staging failed with exit code {result.returncode}")
 
-@asset(deps=[dbt_run], compute_kind="dbt", group_name="Transformation")
+@asset(deps=[meltano_ingestion], compute_kind="dbt", group_name="Transformation")
+def dbt_snapshot(context):
+    """Run dbt snapshot."""
+    env = _dbt_env()
+    context.log.info("Running dbt snapshot as a single materialization step")
+    result = subprocess.run(["dbt", "snapshot"], cwd=DBT_PROJECT_DIR, check=False, env=env, capture_output=True, text=True)
+    context.log.info(f"dbt snapshot output: {result.stdout}")
+    context.log.error(f"dbt snapshot errors: {result.stderr}")
+    if result.returncode != 0:
+        context.log.error(f"dbt snapshot errors:\n{result.stderr}")
+        raise Exception(f"dbt snapshot failed with exit code {result.returncode}")
+
+@asset(deps=[dbt_staging], compute_kind="dbt", group_name="Transformation")
+def dbt_dim(context):
+    """Run dbt dimensions."""
+    env = _dbt_env()
+    context.log.info("Running dbt dimensions as a single materialization step")
+    result = subprocess.run(["dbt", "run", "-s", "marts.dimensions"], cwd=DBT_PROJECT_DIR, check=False, env=env, capture_output=True, text=True)
+    context.log.info(f"dbt dimensions output: {result.stdout}")
+    context.log.error(f"dbt dimensions errors: {result.stderr}")
+    if result.returncode != 0:
+        context.log.error(f"dbt dimensions errors:\n{result.stderr}")
+        raise Exception(f"dbt dimensions failed with exit code {result.returncode}")
+
+@asset(deps=[dbt_dim], compute_kind="dbt", group_name="Transformation")
+def dbt_facts(context):
+    """Run dbt facts."""
+    env = _dbt_env()
+    context.log.info("Running dbt facts as a single materialization step")
+    result = subprocess.run(["dbt", "run", "-s", "marts.facts"], cwd=DBT_PROJECT_DIR, check=False, env=env, capture_output=True, text=True)
+    context.log.info(f"dbt facts output: {result.stdout}")
+    context.log.error(f"dbt facts errors: {result.stderr}")
+    if result.returncode != 0:
+        context.log.error(f"dbt facts errors:\n{result.stderr}")
+        raise Exception(f"dbt facts failed with exit code {result.returncode}")
+
+@asset(deps=[dbt_facts], compute_kind="dbt", group_name="Transformation")
 def dbt_test(context):
     """Run dbt test."""
     env = _dbt_env()

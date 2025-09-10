@@ -48,7 +48,7 @@ def _run(cmd: str, logger=None, *, env: dict | None = None, cwd: str | None = No
         )
 
 
-@asset(name="dbt_elementary_build", deps=[AssetKey("dbt_test")], compute_kind="dbt", group_name="Data_Quality")
+@asset(name="dbt_elementary_build", deps=[AssetKey("dbt_facts")], compute_kind="dbt", group_name="Data_Quality")
 def dbt_elementary_build(context):
     """Run dbt commands to build Elementary models and tests."""
     _run(f"dbt deps --project-dir {DBT_PROJECT_DIR}", context.log)

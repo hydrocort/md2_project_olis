@@ -8,7 +8,7 @@ md2_project_olis:
       project: "{{ env_var('PROJECT_ID') }}"
       dataset: "{{ env_var('STAGING_DATASET_NAME') }}"
       location: US
-      threads: 4
+      threads: 2
       keyfile: "{{ env_var('CREDENTIALS_PATH') }}"
 
 elementary:
@@ -21,4 +21,4 @@ elementary:
       project: "{{ env_var('PROJECT_ID') }}"
       dataset: "{{ env_var('STAGING_DATASET_NAME') }}"
       location: US
-      threads: 4
+      threads: 2

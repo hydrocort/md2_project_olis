@@ -8,6 +8,10 @@ model-paths: ["models"]
 target-path: "target"
 clean-targets: ["target"]
 snapshot-paths: ["snapshots"]
+macro-paths: ["macros"]
+
+flags:
+  require_explicit_package_overrides_for_builtin_materializations: false
 
 models:
   md2_project_olis:
@@ -19,14 +23,22 @@ models:
       +materialized: table
       # Dimension tables
       dimensions:
-        +materialized: table
+        +materialized: incremental
+        +incremental_strategy: merge
+        +on_schema_change: sync_all_columns
         +schema: marts
         
       # Fact tables  
       facts:
-        +materialized: table
+        +materialized: incremental
+        +incremental_strategy: merge
+        +on_schema_change: sync_all_columns
         +schema: marts
 
+snapshots:
+  md2_project_olis:
+    +target_schema: snapshots
+    
 # Configure seeds
 seeds:
   md2_project_olis:

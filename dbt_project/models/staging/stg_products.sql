@@ -1,4 +1,4 @@
-with source as (
+with base as (
 
     select
         trim(product_id) as product_id, 
@@ -23,22 +23,14 @@ with source as (
                  SAFE_CAST(product_height_cm AS FLOAT64) * 
                  SAFE_CAST(product_width_cm AS FLOAT64)
             ELSE 0.0
-        END as product_volume_cm3
+        END as product_volume_cm3,
 
-    from  {{ ref('products_snapshot') }} prds
-    where product_id is not null
+        safe_cast(_sdc_extracted_at as timestamp) as modified_at
 
+    from  {{ source(env_var('RAW_DATASET_NAME'), 'products') }} prds
+),
+ranked as (
+  select *, row_number() over (partition by product_id order by modified_at desc) rn
+  from base
 )
-
-select
-    product_id,
-    product_category_name,
-    product_name_length,
-    product_description_length,
-    product_photos_qty,
-    product_weight_g,
-    product_length_cm,
-    product_height_cm,
-    product_width_cm,
-    product_volume_cm3
-from source
+select * except(rn) from ranked where rn=1

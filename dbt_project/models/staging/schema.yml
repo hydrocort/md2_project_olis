@@ -110,7 +110,7 @@ models:
               min_value: 0.0  # Allow free shipping
               max_value: 999999  # Maximum reasonable shipping cost
 
-  - name: stg_order_payments
+  - name: stg_payments
     description: "Staging model for payment data with payment method aggregation"
     columns:
       - name: order_id
@@ -218,38 +218,6 @@ models:
         description: "Seller's zip code prefix for location"
         tests:
           - dbt_expectations.expect_column_values_to_not_be_null
-
-  - name: stg_geolocation
-    description: "Staging model for geolocation data with coordinate validation"
-    columns:
-      - name: geolocation_zip_code_prefix
-        description: "Zip code prefix for location"
-        tests:
-          - dbt_expectations.expect_column_values_to_not_be_null
-      - name: geolocation_lat
-        description: "Latitude coordinate"
-        tests:
-          - dbt_expectations.expect_column_values_to_not_be_null
-          - dbt_utils.accepted_range:
-              min_value: -90
-              max_value: 90
-      - name: geolocation_lng
-        description: "Longitude coordinate"
-        tests:
-          - dbt_expectations.expect_column_values_to_not_be_null
-          - dbt_utils.accepted_range:
-              min_value: -180
-              max_value: 180
-      - name: geolocation_city
-        description: "City name"
-        tests:
-          - dbt_expectations.expect_column_values_to_not_be_null
-      - name: geolocation_state
-        description: "State name (2-letter Brazilian state code)"
-        tests:
-          - dbt_expectations.expect_column_values_to_not_be_null
-          - accepted_values:
-              values: ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SP', 'SE', 'TO']
 
   - name: stg_category_translation
     description: "Staging model for product category translation data (Portuguese to English)"

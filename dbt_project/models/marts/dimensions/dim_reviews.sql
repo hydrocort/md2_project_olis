@@ -1,3 +1,8 @@
+{{ config(
+    partition_by={"field":"modified_at","data_type":"timestamp","granularity":"day"},
+    cluster_by=['review_key'],
+    unique_key='review_key'
+) }}
 WITH review_base AS (
   SELECT
     -- Primary key
@@ -7,10 +12,14 @@ WITH review_base AS (
     review_score,
     review_comment_title,
     review_comment_message,
-    review_creation_date
+    review_creation_date,
+    modified_at
     
   FROM {{ ref('stg_order_reviews') }}
-  WHERE order_id IS NOT NULL
+  {% if is_incremental() %}
+    where modified_at >
+      (select coalesce(max(modified_at), timestamp('1970-01-01')) from {{ this }})
+  {% endif %}
 ),
 
 -- Deduplicate reviews: keep most recent review per order
@@ -21,6 +30,7 @@ deduplicated_reviews AS (
     review_comment_title,
     review_comment_message,
     review_creation_date,
+    modified_at,
     -- Use ROW_NUMBER to rank reviews by creation date (most recent first)
     ROW_NUMBER() OVER (
       PARTITION BY review_key 
@@ -35,7 +45,8 @@ unique_reviews AS (
     review_score,
     review_comment_title,
     review_comment_message,
-    review_creation_date
+    review_creation_date,
+    modified_at
   FROM deduplicated_reviews
   WHERE rn = 1  -- Keep only the most recent review per order
 ),
@@ -79,4 +90,3 @@ review_metrics AS (
 )
 
 SELECT * FROM review_metrics
-ORDER BY review_key
