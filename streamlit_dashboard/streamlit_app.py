@@ -41,6 +41,9 @@ from utils.visualization_helpers import (
     create_customer_behavior_pie_chart,
     create_customer_value_pie_chart
 )
+from fix_secrets import fix_secrets
+
+fix_secrets()
 
 # Page configuration
 st.set_page_config(
@@ -275,7 +278,7 @@ def main():
                 # Create comprehensive sales trend chart
                 st.subheader("Sales Performance Over Time")
                 sales_chart = create_sales_trend_chart(sales_data)
-                st.plotly_chart(sales_chart, use_container_width=True)
+                st.plotly_chart(sales_chart, width="stretch")
                 
                 # Detailed data table
                 st.subheader("Detailed Monthly Breakdown")
@@ -300,7 +303,7 @@ def main():
                 
                 st.dataframe(
                     display_data[list(display_columns.keys())].rename(columns=display_columns),
-                    use_container_width=True,
+                    width="stretch",
                     hide_index=True
                 )
                 
@@ -407,7 +410,7 @@ def main():
                     )
                     # Rotate x-axis labels for better readability
                     revenue_chart.update_xaxes(tickangle=45)
-                    st.plotly_chart(revenue_chart, use_container_width=True)
+                    st.plotly_chart(revenue_chart, width="stretch")
             
                 with col2:
                     # Pie chart for revenue distribution
@@ -428,7 +431,7 @@ def main():
                         title='Revenue Share by Category',
                         height=500
                     )
-                    st.plotly_chart(pie_chart, use_container_width=True)
+                    st.plotly_chart(pie_chart, width="stretch")
                 
                 # Secondary visualizations
                 col1, col2 = st.columns(2)
@@ -455,7 +458,7 @@ def main():
                         plot_bgcolor='white',
                         paper_bgcolor='white'
                     )
-                    st.plotly_chart(scatter_fig, use_container_width=True)
+                    st.plotly_chart(scatter_fig, width="stretch")
                 
                 with col2:
                     # Average item value by category
@@ -470,7 +473,7 @@ def main():
                         height=400
                     )
                     avg_value_chart.update_xaxes(tickangle=45)
-                    st.plotly_chart(avg_value_chart, use_container_width=True)
+                    st.plotly_chart(avg_value_chart, width="stretch")
                 
                 # Detailed performance table
                 st.subheader("Detailed Category Performance")
@@ -497,7 +500,7 @@ def main():
                 
                 st.dataframe(
                     display_data[list(display_columns.keys())].rename(columns=display_columns),
-                    use_container_width=True,
+                    width="stretch",
                     hide_index=True
                 )
                 
@@ -591,7 +594,7 @@ def main():
                         y_title='Total Sales ($)',
                         height=400
                     )
-                    st.plotly_chart(customer_chart, use_container_width=True)
+                    st.plotly_chart(customer_chart, width="stretch")
                 
                 with col2:
                     # Seller regions performance
@@ -605,7 +608,7 @@ def main():
                         y_title='Total Sales ($)',
                         height=400
                     )
-                    st.plotly_chart(seller_chart, use_container_width=True)
+                    st.plotly_chart(seller_chart, width="stretch")
                 
                 # Customer-Seller Flow Analysis
                 if not flow_data.empty:
@@ -628,7 +631,7 @@ def main():
                             title='Sales: Same vs Cross-Region Transactions',
                             height=400
                         )
-                        st.plotly_chart(pie_chart, use_container_width=True)
+                        st.plotly_chart(pie_chart, width="stretch")
                     
                     with col2:
                         # Cross-region flow details
@@ -645,7 +648,7 @@ def main():
                                     'total_sales': 'Sales',
                                     'total_orders': 'Orders'
                                 }),
-                                use_container_width=True,
+                                width="stretch",
                                 hide_index=True
                             )
                 
@@ -654,7 +657,7 @@ def main():
                 st.markdown("Heatmap showing sales flow between customer and seller regions")
                 
                 heatmap_chart = create_regional_heatmap(regional_data)
-                st.plotly_chart(heatmap_chart, use_container_width=True)
+                st.plotly_chart(heatmap_chart, width="stretch")
                 
                 # State-level breakdown
                 if not state_data.empty:
@@ -674,7 +677,7 @@ def main():
                             height=450
                         )
                         top_states_chart.update_xaxes(tickangle=45)
-                        st.plotly_chart(top_states_chart, use_container_width=True)
+                        st.plotly_chart(top_states_chart, width="stretch")
                     
                     with col2:
                         # Regional distribution of states
@@ -686,7 +689,7 @@ def main():
                             title='States by Region',
                             height=450
                         )
-                        st.plotly_chart(region_pie, use_container_width=True)
+                        st.plotly_chart(region_pie, width="stretch")
                     
                     # Detailed state data table
                     if selected_region != "All Regions":
@@ -714,7 +717,7 @@ def main():
                     
                     st.dataframe(
                         display_state_data[list(display_columns.keys())].rename(columns=display_columns),
-                        use_container_width=True,
+                        width="stretch",
                         hide_index=True
                     )
                 
@@ -797,7 +800,7 @@ def main():
                         title='Average Customer Lifetime Value by Region',
                         x_title='Region', y_title='Avg Lifetime Value ($)', height=400
                     )
-                    st.plotly_chart(ltv_chart, use_container_width=True)
+                    st.plotly_chart(ltv_chart, width="stretch")
                 
                 with col2:
                     st.subheader("Customer Distribution by Behavior")
@@ -805,7 +808,7 @@ def main():
                         behavior_segments = segmentation_data.groupby('customer_segment')['customer_count'].sum().reset_index()
                         seg_pie = create_customer_behavior_pie_chart(behavior_segments, 'customer_segment', 'customer_count', 
                                                  'Customer Distribution by Behavior', height=400)
-                        st.plotly_chart(seg_pie, use_container_width=True)
+                        st.plotly_chart(seg_pie, width="stretch")
                     else:
                         st.info("No segmentation data available")
                 
@@ -824,7 +827,7 @@ def main():
                         title='Customer Retention Rate by Region',
                         x_title='Region', y_title='Retention Rate (%)', height=400
                     )
-                    st.plotly_chart(retention_chart, use_container_width=True)
+                    st.plotly_chart(retention_chart, width="stretch")
                 
                 with col2:
                     st.subheader("Revenue by Customer Value Segment")
@@ -832,7 +835,7 @@ def main():
                         value_segments = segmentation_data.groupby('value_segment')['segment_total_value'].sum().reset_index()
                         val_pie = create_customer_value_pie_chart(value_segments, 'value_segment', 'segment_total_value',
                                                  'Revenue by Customer Value Segment', height=400)
-                        st.plotly_chart(val_pie, use_container_width=True)
+                        st.plotly_chart(val_pie, width="stretch")
                     else:
                         st.info("No segmentation data available")
                 
@@ -852,7 +855,7 @@ def main():
                     # Force x-axis to be categorical
                     freq_chart.update_xaxes(type='category')
                     
-                    st.plotly_chart(freq_chart, use_container_width=True)
+                    st.plotly_chart(freq_chart, width="stretch")
                     
                     # Interactive Purchase Frequency Details Table
                     st.markdown("**Purchase Frequency Details**")
@@ -896,7 +899,7 @@ def main():
                         
                         st.dataframe(
                             display_freq_data[list(display_columns.keys())].rename(columns=display_columns),
-                            use_container_width=True,
+                            width="stretch",
                             hide_index=True
                         )
                     else:
@@ -914,7 +917,7 @@ def main():
                     'customer_region': 'Region', 'customer_count': 'Customers', 
                     'avg_orders_per_customer': 'Avg Orders', 'avg_customer_lifetime_value': 'Avg LTV',
                     'avg_order_value': 'Avg Order Value'
-                }), use_container_width=True, hide_index=True)
+                }), width="stretch", hide_index=True)
                 
                 # Download option
                 csv = behavior_data.to_csv(index=False)
@@ -971,7 +974,7 @@ def main():
                 # Payment method analysis charts
                 st.subheader("Payment Method Performance")
                 payment_chart = create_payment_method_chart(payment_data)
-                st.plotly_chart(payment_chart, use_container_width=True)
+                st.plotly_chart(payment_chart, width="stretch")
                 
                 # Payment method comparison
                 col1, col2 = st.columns(2)
@@ -985,7 +988,7 @@ def main():
                         x_title='Payment Method', y_title='Number of Orders', height=400
                     )
                     orders_chart.update_xaxes(tickangle=45)
-                    st.plotly_chart(orders_chart, use_container_width=True)
+                    st.plotly_chart(orders_chart, width="stretch")
                 
                 with col2:
                     st.subheader("Average Order Value by Payment Type")
@@ -996,7 +999,7 @@ def main():
                         x_title='Payment Method', y_title='Avg Order Value ($)', height=400
                     )
                     aov_chart.update_xaxes(tickangle=45)
-                    st.plotly_chart(aov_chart, use_container_width=True)
+                    st.plotly_chart(aov_chart, width="stretch")
                                
                 # Installment analysis
                 if not installment_data.empty:
@@ -1012,7 +1015,7 @@ def main():
                             title='Orders by Number of Installments',
                             x_title='Number of Installments', y_title='Order Count', height=400
                         )
-                        st.plotly_chart(installment_chart, use_container_width=True)
+                        st.plotly_chart(installment_chart, width="stretch")
                     
                     with col2:
                         st.write("**Average Order Value by Installments**")
@@ -1022,7 +1025,7 @@ def main():
                             title='Avg Order Value by Installments',
                             x_title='Number of Installments', y_title='Avg Order Value ($)', height=400
                         )
-                        st.plotly_chart(installment_value_chart, use_container_width=True)
+                        st.plotly_chart(installment_value_chart, width="stretch")
                 
                 # Detailed payment data table
                 st.subheader("Payment Method Performance Summary")
@@ -1043,7 +1046,7 @@ def main():
                 
                 st.dataframe(
                     display_data[list(payment_columns.keys())].rename(columns=payment_columns),
-                    use_container_width=True, hide_index=True
+                    width="stretch", hide_index=True
                 )
                 
                 # Installment summary table
@@ -1064,7 +1067,7 @@ def main():
                     
                     st.dataframe(
                         installment_display[list(installment_columns.keys())].rename(columns=installment_columns),
-                        use_container_width=True, hide_index=True
+                        width="stretch", hide_index=True
                     )
                 
                 # Download options
@@ -1149,7 +1152,7 @@ def main():
                         title='Total Revenue by Seller Region',
                         x_title='Seller Region', y_title='Total Revenue ($)', height=400
                     )
-                    st.plotly_chart(revenue_chart, use_container_width=True)
+                    st.plotly_chart(revenue_chart, width="stretch")
                 
                 with col2:
                     st.subheader("Revenue per Seller by Region")
@@ -1159,7 +1162,7 @@ def main():
                         title='Average Revenue per Seller by Region',
                         x_title='Seller Region', y_title='Revenue per Seller ($)', height=400
                     )
-                    st.plotly_chart(efficiency_chart, use_container_width=True)
+                    st.plotly_chart(efficiency_chart, width="stretch")
                 
                 # Seller distribution analysis
                 col1, col2 = st.columns(2)
@@ -1170,7 +1173,7 @@ def main():
                         seller_data, 'seller_region', 'unique_sellers',
                         'Seller Count by Region', height=400
                     )
-                    st.plotly_chart(seller_pie, use_container_width=True)
+                    st.plotly_chart(seller_pie, width="stretch")
                 
                 with col2:
                     st.subheader("Product Diversity by Region")
@@ -1180,7 +1183,7 @@ def main():
                         title='Unique Products Sold by Region',
                         x_title='Seller Region', y_title='Unique Products', height=400
                     )
-                    st.plotly_chart(products_chart, use_container_width=True)
+                    st.plotly_chart(products_chart, width="stretch")
                 
                 # Top sellers analysis
                 if not top_sellers_data.empty:
@@ -1195,7 +1198,7 @@ def main():
                             'Top Sellers by Revenue', 'Seller ID', 'Revenue ($)', height=400
                         )
                         top_revenue_chart.update_xaxes(tickangle=45)
-                        st.plotly_chart(top_revenue_chart, use_container_width=True)
+                        st.plotly_chart(top_revenue_chart, width="stretch")
                     
                     with col2:
                         st.write("**Regional Distribution of Top Sellers**")
@@ -1204,7 +1207,7 @@ def main():
                             top_sellers_region, 'seller_region', 'seller_count',
                             'Top Sellers by Region', height=400
                         )
-                        st.plotly_chart(top_region_pie, use_container_width=True)
+                        st.plotly_chart(top_region_pie, width="stretch")
                 
                 # Seller diversity analysis
                 if not diversity_data.empty:
@@ -1220,7 +1223,7 @@ def main():
                             title='Avg Product Categories per Seller',
                             x_title='Seller Region', y_title='Avg Categories', height=400
                         )
-                        st.plotly_chart(diversity_chart, use_container_width=True)
+                        st.plotly_chart(diversity_chart, width="stretch")
                     
                     with col2:
                         st.write("**Seller Specialization Analysis**")
@@ -1234,7 +1237,7 @@ def main():
                             title='Single-Category Seller Rate by Region',
                             x_title='Seller Region', y_title='Specialization Rate (%)', height=400
                         )
-                        st.plotly_chart(spec_chart, use_container_width=True)
+                        st.plotly_chart(spec_chart, width="stretch")
                 
                 # Performance correlation analysis
                 st.subheader("Seller Performance Correlation")
@@ -1248,7 +1251,7 @@ def main():
                         height=500
                     )
                     correlation_fig.update_layout(title_x=0.5, plot_bgcolor='white', paper_bgcolor='white')
-                    st.plotly_chart(correlation_fig, use_container_width=True)
+                    st.plotly_chart(correlation_fig, width="stretch")
                 
                 # Detailed data tables
                 st.subheader("Regional Seller Performance Summary")
@@ -1272,7 +1275,7 @@ def main():
                 
                 st.dataframe(
                     display_data[list(regional_columns.keys())].rename(columns=regional_columns),
-                    use_container_width=True, hide_index=True
+                    width="stretch", hide_index=True
                 )
                 
                 # Top sellers detailed table
@@ -1296,7 +1299,7 @@ def main():
                     
                     st.dataframe(
                         top_display[list(top_columns.keys())].rename(columns=top_columns),
-                        use_container_width=True, hide_index=True
+                        width="stretch", hide_index=True
                     )
                 
                 # Download options
@@ -1379,7 +1382,7 @@ def main():
                         x_title='Review Category', y_title='Total Sales ($)', height=400
                     )
                     sales_chart.update_xaxes(tickangle=45)
-                    st.plotly_chart(sales_chart, use_container_width=True)
+                    st.plotly_chart(sales_chart, width="stretch")
                 
                 with col2:
                     st.write("**Average Item Value by Review Category**")
@@ -1390,7 +1393,7 @@ def main():
                         x_title='Review Category', y_title='Avg Item Value ($)', height=400
                     )
                     value_chart.update_xaxes(tickangle=45)
-                    st.plotly_chart(value_chart, use_container_width=True)
+                    st.plotly_chart(value_chart, width="stretch")
                 
                 # Review availability analysis
                 col1, col2 = st.columns(2)
@@ -1411,7 +1414,7 @@ def main():
                         availability_data, 'category', 'items',
                         'Item Distribution by Review Availability', height=400
                     )
-                    st.plotly_chart(availability_pie, use_container_width=True)
+                    st.plotly_chart(availability_pie, width="stretch")
                 
                 with col2:
                     st.subheader("Sales Distribution by Review Availability")
@@ -1419,7 +1422,7 @@ def main():
                         availability_data, 'category', 'sales',
                         'Sales Distribution by Review Availability', height=400
                     )
-                    st.plotly_chart(sales_pie, use_container_width=True)
+                    st.plotly_chart(sales_pie, width="stretch")
                 
                 # Detailed review score analysis
                 if not score_distribution.empty:
@@ -1434,7 +1437,7 @@ def main():
                             'Items by Review Score (0 = No Review)',
                             'Review Score', 'Total Items', height=400
                         )
-                        st.plotly_chart(score_chart, use_container_width=True)
+                        st.plotly_chart(score_chart, width="stretch")
                     
                     with col2:
                         st.write("**Sales Value by Review Score**")
@@ -1443,7 +1446,7 @@ def main():
                             'Sales by Review Score (0 = No Review)',
                             'Review Score', 'Total Sales ($)', height=400
                         )
-                        st.plotly_chart(score_sales_chart, use_container_width=True)
+                        st.plotly_chart(score_sales_chart, width="stretch")
                 
                 # Review timing analysis
                 if not timing_data.empty:
@@ -1459,7 +1462,7 @@ def main():
                             'Review Timing', 'Avg Review Score', height=400
                         )
                         timing_score_chart.update_xaxes(tickangle=45)
-                        st.plotly_chart(timing_score_chart, use_container_width=True)
+                        st.plotly_chart(timing_score_chart, width="stretch")
                     
                     with col2:
                         st.write("**Sales Value by Review Timing**")
@@ -1469,7 +1472,7 @@ def main():
                             'Review Timing', 'Total Sales ($)', height=400
                         )
                         timing_sales_chart.update_xaxes(tickangle=45)
-                        st.plotly_chart(timing_sales_chart, use_container_width=True)
+                        st.plotly_chart(timing_sales_chart, width="stretch")
                 
                 # Review correlation insights
                 st.subheader("Review-Sales Correlation Insights")
@@ -1486,7 +1489,7 @@ def main():
                         height=500
                     )
                     correlation_fig.update_layout(title_x=0.5, plot_bgcolor='white', paper_bgcolor='white')
-                    st.plotly_chart(correlation_fig, use_container_width=True)
+                    st.plotly_chart(correlation_fig, width="stretch")
                 
                 # Detailed data tables
                 st.subheader("Review Category Performance Summary")
@@ -1509,7 +1512,7 @@ def main():
                 
                 st.dataframe(
                     display_data[list(review_columns.keys())].rename(columns=review_columns),
-                    use_container_width=True, hide_index=True
+                    width="stretch", hide_index=True
                 )
                 
                 # Score distribution table
@@ -1532,7 +1535,7 @@ def main():
                     
                     st.dataframe(
                         score_display[list(score_columns.keys())].rename(columns=score_columns),
-                        use_container_width=True, hide_index=True
+                        width="stretch", hide_index=True
                     )
                 
                 # Download options
@@ -1613,7 +1616,7 @@ def main():
                         title='Average Delivery Days by Region',
                         x_title='Customer Region', y_title='Average Days', height=400
                     )
-                    st.plotly_chart(delivery_chart, use_container_width=True)
+                    st.plotly_chart(delivery_chart, width="stretch")
                 
                 with col2:
                     st.write("**On-Time Delivery Rate by Region**")
@@ -1623,7 +1626,7 @@ def main():
                         title='On-Time Delivery Rate by Region',
                         x_title='Customer Region', y_title='On-Time Rate (%)', height=400
                     )
-                    st.plotly_chart(ontime_chart, use_container_width=True)
+                    st.plotly_chart(ontime_chart, width="stretch")
                 
                 # Delivery performance distribution
                 col1, col2 = st.columns(2)
@@ -1634,7 +1637,7 @@ def main():
                         delivery_data, 'customer_region', 'total_orders',
                         'Order Volume by Region', height=400
                     )
-                    st.plotly_chart(volume_pie, use_container_width=True)
+                    st.plotly_chart(volume_pie, width="stretch")
                 
                 with col2:
                     st.subheader("Delivery vs Estimate Performance")
@@ -1644,7 +1647,7 @@ def main():
                         title='Delivery vs Estimate (Negative = Early)',
                         x_title='Customer Region', y_title='Days vs Estimate', height=400
                     )
-                    st.plotly_chart(estimate_chart, use_container_width=True)
+                    st.plotly_chart(estimate_chart, width="stretch")
                 
                 # Delivery time distribution analysis
                 if not distribution_data.empty:
@@ -1660,7 +1663,7 @@ def main():
                             'Delivery Speed', 'Total Orders', height=400
                         )
                         speed_chart.update_xaxes(tickangle=45)
-                        st.plotly_chart(speed_chart, use_container_width=True)
+                        st.plotly_chart(speed_chart, width="stretch")
                     
                     with col2:
                         st.write("**On-Time Rate by Delivery Speed**")
@@ -1670,7 +1673,7 @@ def main():
                             'Delivery Speed', 'On-Time Rate (%)', height=400
                         )
                         speed_ontime_chart.update_xaxes(tickangle=45)
-                        st.plotly_chart(speed_ontime_chart, use_container_width=True)
+                        st.plotly_chart(speed_ontime_chart, width="stretch")
                 
                 # Same vs cross-region delivery efficiency
                 if not efficiency_data.empty:
@@ -1694,7 +1697,7 @@ def main():
                             'Average Delivery Days by Type',
                             'Delivery Type', 'Avg Days', height=400
                         )
-                        st.plotly_chart(efficiency_chart, use_container_width=True)
+                        st.plotly_chart(efficiency_chart, width="stretch")
                     
                     with col2:
                         st.write("**Freight Cost: Same vs Cross-Region**")
@@ -1703,7 +1706,7 @@ def main():
                             'Average Freight Cost by Type',
                             'Delivery Type', 'Avg Freight Cost ($)', height=400
                         )
-                        st.plotly_chart(freight_chart, use_container_width=True)
+                        st.plotly_chart(freight_chart, width="stretch")
                 
                 # Performance correlation analysis
                 st.subheader("Delivery Performance Correlation")
@@ -1717,7 +1720,7 @@ def main():
                         height=500
                     )
                     correlation_fig.update_layout(title_x=0.5, plot_bgcolor='white', paper_bgcolor='white')
-                    st.plotly_chart(correlation_fig, use_container_width=True)
+                    st.plotly_chart(correlation_fig, width="stretch")
                 
                 # Detailed data tables
                 st.subheader("Regional Delivery Performance Summary")
@@ -1740,7 +1743,7 @@ def main():
                 
                 st.dataframe(
                     display_data[list(delivery_columns.keys())].rename(columns=delivery_columns),
-                    use_container_width=True, hide_index=True
+                    width="stretch", hide_index=True
                 )
                 
                 # Speed distribution table
@@ -1762,7 +1765,7 @@ def main():
                     
                     st.dataframe(
                         speed_display[list(speed_columns.keys())].rename(columns=speed_columns),
-                        use_container_width=True, hide_index=True
+                        width="stretch", hide_index=True
                     )
                 
                 # Download options
