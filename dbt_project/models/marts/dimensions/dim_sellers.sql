@@ -1,3 +1,8 @@
+{{ config(
+    partition_by={"field":"modified_at","data_type":"timestamp","granularity":"day"},
+    cluster_by=['seller_key'],
+    unique_key='seller_key'
+) }}
 WITH seller_base AS (
   SELECT
     -- Primary key
@@ -6,10 +11,14 @@ WITH seller_base AS (
     -- Location data (cleaned from staging)
     seller_city,
     seller_state,
-    seller_zip_prefix
+    seller_zip_prefix,
+    modified_at
     
   FROM {{ ref('stg_sellers') }}
-  WHERE seller_id IS NOT NULL
+  {% if is_incremental() %}
+    where modified_at >
+      (select coalesce(max(modified_at), timestamp('1970-01-01')) from {{ this }})
+  {% endif %}
 ),
 
 seller_regions AS (
@@ -29,4 +38,3 @@ seller_regions AS (
 )
 
 SELECT * FROM seller_regions
-ORDER BY seller_key

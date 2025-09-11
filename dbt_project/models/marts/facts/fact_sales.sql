@@ -1,3 +1,12 @@
+{{ config(
+    materialized='incremental',
+    incremental_strategy='merge',
+    unique_key='order_item_sk',
+    on_schema_change='sync_all_columns',
+    partition_by={"field":"order_purchase_ts","data_type":"timestamp","granularity":"day"},
+    cluster_by=['order_key','customer_key','product_key','seller_key']
+) }}
+
 WITH order_items_base AS (
   SELECT
     -- Surrogate key: unique identifier for each order item
@@ -14,12 +23,18 @@ WITH order_items_base AS (
     1 as quantity,  -- Each order item represents 1 product
     
     -- Calculate total item value (price + freight)
-    price + freight_value as total_item_value
+    price + freight_value as total_item_value,
+    modified_at
     
   FROM {{ ref('stg_order_items') }}
-  WHERE order_id IS NOT NULL 
-    AND product_id IS NOT NULL 
-    AND seller_id IS NOT NULL
+  WHERE TRUE
+  {% if is_incremental() %}
+    AND modified_at >
+      (select coalesce(max(modified_at), timestamp('1970-01-01')) from {{ this }})
+  {% endif %}
+  AND order_id IS NOT NULL 
+  AND product_id IS NOT NULL 
+  AND seller_id IS NOT NULL
 ),
 
 enriched_orders AS (
@@ -29,7 +44,9 @@ enriched_orders AS (
     -- Customer key from customers table (using customer_unique_id)
     c.customer_unique_id as customer_key,
     -- Date key for temporal analysis
-    FORMAT_DATE('%Y-%m-%d', o.order_purchase_timestamp) as date_key
+    FORMAT_DATE('%Y-%m-%d', o.order_purchase_timestamp) as date_key,
+    o.order_purchase_timestamp AS order_purchase_ts,
+    o.modified_at as order_modified_at
     
   FROM order_items_base oi
   INNER JOIN {{ ref('stg_orders') }} o
@@ -39,6 +56,12 @@ enriched_orders AS (
   WHERE o.customer_id IS NOT NULL
     AND o.order_purchase_timestamp IS NOT NULL
     AND c.customer_unique_id IS NOT NULL
+  {% if is_incremental() %}
+    AND o.modified_at >
+      (select coalesce(max(o.modified_at), timestamp('1970-01-01')) from {{ this }})
+    AND c.modified_at >
+      (select coalesce(max(c.modified_at), timestamp('1970-01-01')) from {{ this }})
+  {% endif %}
   ),
 
 final_fact AS (
@@ -77,7 +100,9 @@ final_fact AS (
     COALESCE(p.uses_debit_card, FALSE) as uses_debit_card,
     
     -- Primary payment type
-    COALESCE(p.primary_payment_type, 'unknown') as primary_payment_type
+    COALESCE(p.primary_payment_type, 'unknown') as primary_payment_type,
+    eo.order_purchase_ts,
+    eo.modified_at as fact_modified_at,
     
   FROM enriched_orders eo
   
@@ -91,4 +116,3 @@ final_fact AS (
 )
 
 SELECT * FROM final_fact
-ORDER BY order_item_sk

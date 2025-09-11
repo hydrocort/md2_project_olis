@@ -3,6 +3,10 @@ WITH order_dates AS (
     DATE(order_purchase_timestamp) as full_date
   FROM {{ ref('stg_orders') }}
   WHERE order_purchase_timestamp IS NOT NULL
+  {% if is_incremental() %}
+    AND modified_at >
+      (select coalesce(max(modified_at), timestamp('1970-01-01')) from {{ this }})
+  {% endif %}
 ),
 
 date_components AS (

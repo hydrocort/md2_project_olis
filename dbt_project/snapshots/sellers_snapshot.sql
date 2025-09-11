@@ -3,15 +3,9 @@
     config(
       target_schema=env_var('SNAPSHOT_DATASET_NAME'),
       unique_key='seller_id',
-      strategy='check',
-      check_cols=[
-        'seller_zip_code_prefix',
-        'seller_city',
-        'seller_state'
-      ]
+      strategy='timestamp',
+      updated_at='_sdc_extracted_at'
     )
 }}
-SELECT *
-FROM {{ source(env_var('RAW_DATASET_NAME'), 'sellers') }} 
-WHERE seller_id IS NOT NULL
+SELECT * FROM {{ source(env_var('RAW_DATASET_NAME'), 'sellers') }}
 {% endsnapshot %}

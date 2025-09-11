@@ -1,3 +1,8 @@
+{{ config(
+    partition_by={"field":"modified_at","data_type":"timestamp","granularity":"day"},
+    cluster_by=['order_key'],
+    unique_key='order_key'
+) }}
 WITH order_base AS (
   SELECT
     -- Primary key
@@ -9,10 +14,14 @@ WITH order_base AS (
     order_approved_at,
     order_delivered_carrier_date,
     order_delivered_customer_date,
-    order_estimated_delivery_date
+    order_estimated_delivery_date,
+    modified_at
     
   FROM {{ ref('stg_orders') }}
-  WHERE order_id IS NOT NULL
+  {% if is_incremental() %}
+    where modified_at >
+      (select coalesce(max(modified_at), timestamp('1970-01-01')) from {{ this }})
+  {% endif %}
 ),
 
 order_metrics AS (
@@ -63,4 +72,3 @@ order_metrics AS (
 )
 
 SELECT * FROM order_metrics
-ORDER BY order_key

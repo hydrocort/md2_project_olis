@@ -1,19 +1,15 @@
-with source as (
+with base as (
     select
         seller_id,
         trim(seller_zip_code_prefix) as seller_zip_prefix,
         trim(lower(seller_city)) as seller_city,
         upper(trim(seller_state)) as seller_state,
-        -- Remove Meltano metadata columns
-        -- _sdc_extracted_at, _sdc_table_version
-    from {{ ref('sellers_snapshot') }}
-    where seller_id is not null
+        
+        safe_cast(_sdc_extracted_at as timestamp) as modified_at
+    from {{ source(env_var('RAW_DATASET_NAME'), 'sellers') }}
+),
+ranked as (
+  select *, row_number() over (partition by seller_id order by modified_at desc) rn
+  from base
 )
-
-select
-    seller_id,
-    seller_zip_prefix,
-    seller_city,
-    seller_state
-from source
-
+select * except(rn) from ranked where rn=1

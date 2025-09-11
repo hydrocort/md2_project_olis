@@ -1,3 +1,8 @@
+{{ config(
+    partition_by={"field":"modified_at","data_type":"timestamp","granularity":"day"},
+    cluster_by=['payment_key'],
+    unique_key='payment_key',
+) }}
 WITH payment_aggregation AS (
   SELECT
     -- Primary key (one record per order)
@@ -16,12 +21,15 @@ WITH payment_aggregation AS (
     SUM(payment_value) as total_payment_value,
     SUM(payment_installments) as total_installments,
     COUNT(DISTINCT payment_type) as payment_methods_count,
-    COUNT(*) as payment_transactions_count
+    COUNT(*) as payment_transactions_count,
+    MAX(modified_at) as modified_at
     
   FROM {{ ref('stg_payments') }}
-  WHERE order_id IS NOT NULL
+  {% if is_incremental() %}
+    where modified_at >
+      (select coalesce(max(modified_at), timestamp('1970-01-01')) from {{ this }})
+  {% endif %}
   GROUP BY order_id
 )
 
 SELECT * FROM payment_aggregation
-ORDER BY payment_key
