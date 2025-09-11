@@ -43,7 +43,7 @@ from utils.visualization_helpers import (
 )
 from fix_secrets import fix_secrets
 
-fix_secrets()  # Ensure secrets.toml is properly formatted
+fix_secrets()
 
 # Page configuration
 st.set_page_config(
@@ -53,7 +53,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for better styling
+# Custom CSS for better styling and responsive tabs
 st.markdown("""
 <style>
     .main-header {
@@ -72,6 +72,92 @@ st.markdown("""
     .tab-content {
         padding: 1rem 0;
     }
+    
+    /* Enhanced tab styling for better mobile experience */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 4px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: thin;
+        scrollbar-color: #d4d4d4 #f0f2f6;
+        scroll-behavior: smooth;
+        padding: 4px 8px;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar-track {
+        background: #f0f2f6;
+        border-radius: 3px;
+    }
+    
+    .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar-thumb {
+        background: #d4d4d4;
+        border-radius: 3px;
+    }
+    
+    .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar-thumb:hover {
+        background: #b3b3b3;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        flex-shrink: 0;
+        white-space: nowrap;
+        min-width: fit-content;
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+    
+    /* Mobile responsive adjustments */
+    @media (max-width: 768px) {
+        .stTabs [data-baseweb="tab"] {
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+        
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 2px;
+            padding: 2px 4px;
+        }
+        
+        .main-header {
+            font-size: 2rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .stTabs [data-baseweb="tab"] {
+            font-size: 10px;
+            padding: 4px 8px;
+        }
+        
+        .main-header {
+            font-size: 1.5rem;
+        }
+    }
+    
+    /* Scroll hint for mobile */
+    .stTabs::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 20px;
+        height: 100%;
+        background: linear-gradient(to left, rgba(255,255,255,0.8), transparent);
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    @media (min-width: 769px) {
+        .stTabs::before {
+            display: none;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -80,6 +166,15 @@ def main():
     
     # Header
     st.markdown('<h1 class="main-header">Olist E-commerce Analytics Dashboard</h1>', unsafe_allow_html=True)
+    
+    # Mobile scroll hint
+    if st.session_state.get('show_mobile_hint', True):
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.info("📱 On mobile? Swipe left/right on tabs to navigate all sections", icon="💡")
+        if st.button("Got it!", key="dismiss_hint"):
+            st.session_state.show_mobile_hint = False
+            st.rerun()
     
     # Sidebar
     with st.sidebar:
@@ -905,35 +1000,7 @@ def main():
                     )
                     aov_chart.update_xaxes(tickangle=45)
                     st.plotly_chart(aov_chart, width="stretch")
-                
-                # Payment behavior insights
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    st.subheader("Payment Usage Patterns")
-                    
-                    # Create payment usage summary using total_orders
-                    payment_usage = payment_data[['primary_payment_type', 'total_orders']].copy()
-                    
-                    usage_pie = create_pie_chart(
-                        payment_usage, 'primary_payment_type', 'total_orders',
-                        'Payment Method Usage Distribution', height=400
-                    )
-                    st.plotly_chart(usage_pie, width="stretch")
-                
-                with col2:
-                    st.subheader("Payment vs Sales Correlation")
-                    # Scatter plot showing correlation
-                    correlation_fig = px.scatter(
-                        payment_data, x='avg_order_value', y='total_sales',
-                        size='total_orders', hover_name='primary_payment_type',
-                        title='Payment Method: Order Value vs Total Sales',
-                        labels={'avg_order_value': 'Avg Order Value ($)', 'total_sales': 'Total Sales ($)', 'total_orders': 'Orders'},
-                        height=400
-                    )
-                    correlation_fig.update_layout(title_x=0.5, plot_bgcolor='white', paper_bgcolor='white')
-                    st.plotly_chart(correlation_fig, width="stretch")
-                
+                               
                 # Installment analysis
                 if not installment_data.empty:
                     st.subheader("Installment Usage Analysis")
