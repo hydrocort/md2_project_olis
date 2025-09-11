@@ -50,7 +50,7 @@ def meltano_ingestion(context):
     # check all csv files, rewrite with suffix _cleaned, removing BOM and trimming headers
     # This is a basic check; more complex validation can be added as needed
 
-    if not cleaned_csv:
+    if not cleaned_csv and not have_dataset:
         run_process = True
         for csv_file in data_dir.glob("*.csv"):
             # Only process files that do NOT already have '_cleaned.csv' in their name
