@@ -400,14 +400,14 @@ def create_sales_trend_chart(df: pd.DataFrame) -> go.Figure:
                [{"secondary_y": False}, {"secondary_y": False}]]
     )
     
-    # Add traces
+    # Add traces (pure line charts for better trend visualization)
     fig.add_trace(
         go.Scatter(
             x=df['month_year'], 
             y=df['total_sales'],
-            mode='lines+markers',
+            mode='lines',
             name='Total Sales',
-            line=dict(color=COLOR_SCHEMES['primary'][0])
+            line=dict(color=COLOR_SCHEMES['primary'][0], width=2)
         ),
         row=1, col=1
     )
@@ -416,9 +416,9 @@ def create_sales_trend_chart(df: pd.DataFrame) -> go.Figure:
         go.Scatter(
             x=df['month_year'], 
             y=df['total_orders'],
-            mode='lines+markers',
+            mode='lines',
             name='Total Orders',
-            line=dict(color=COLOR_SCHEMES['primary'][1])
+            line=dict(color=COLOR_SCHEMES['primary'][1], width=2)
         ),
         row=1, col=2
     )
@@ -427,9 +427,9 @@ def create_sales_trend_chart(df: pd.DataFrame) -> go.Figure:
         go.Scatter(
             x=df['month_year'], 
             y=df['avg_order_value'],
-            mode='lines+markers',
+            mode='lines',
             name='Avg Order Value',
-            line=dict(color=COLOR_SCHEMES['primary'][2])
+            line=dict(color=COLOR_SCHEMES['primary'][2], width=2)
         ),
         row=2, col=1
     )
@@ -438,9 +438,9 @@ def create_sales_trend_chart(df: pd.DataFrame) -> go.Figure:
         go.Scatter(
             x=df['month_year'], 
             y=df['total_items'],
-            mode='lines+markers',
+            mode='lines',
             name='Total Items',
-            line=dict(color=COLOR_SCHEMES['primary'][3])
+            line=dict(color=COLOR_SCHEMES['primary'][3], width=2)
         ),
         row=2, col=2
     )
@@ -471,21 +471,14 @@ def create_regional_heatmap(df: pd.DataFrame) -> go.Figure:
     """
     if df.empty:
         return go.Figure()
-
-    # Ensure total_sales is float to avoid Decimal errors
-    df = df.copy()
-    df['total_sales'] = df['total_sales'].astype(float)
-
+    
     # Pivot data for heatmap
     pivot_df = df.pivot(
-        index='customer_region',
-        columns='seller_region',
+        index='customer_region', 
+        columns='seller_region', 
         values='total_sales'
     ).fillna(0)
-
-    # Ensure all values are float (in case pivot returns object dtype)
-    pivot_df = pivot_df.astype(float)
-
+    
     fig = go.Figure(data=go.Heatmap(
         z=pivot_df.values,
         x=pivot_df.columns,
@@ -496,7 +489,7 @@ def create_regional_heatmap(df: pd.DataFrame) -> go.Figure:
         textfont={"size": 14},
         hoverongaps=False
     ))
-
+    
     fig.update_layout(
         title="Regional Sales Heatmap (Customer vs Seller)",
         title_x=0.5,
@@ -506,7 +499,7 @@ def create_regional_heatmap(df: pd.DataFrame) -> go.Figure:
         plot_bgcolor='white',
         paper_bgcolor='white'
     )
-
+    
     return fig
 
 def create_payment_method_chart(df: pd.DataFrame) -> go.Figure:
