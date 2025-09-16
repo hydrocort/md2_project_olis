@@ -5,6 +5,8 @@ channels:
 dependencies:
   - python=3.10
   - pip
+  - ipykernel
+  - jupyter
   - pip:
       - dagster==1.9.13
       - dagster-webserver==1.9.13
@@ -29,3 +31,6 @@ dependencies:
       - toml
       - python-dotenv
       - elementary-data==0.19.4
+      - matplotlib
+      - seaborn
+      - kaggle

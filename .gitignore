@@ -28,6 +28,9 @@ logs/
 # keep sample env file if added
 .env.example
 
+# Development guidance files
+CLAUDE.md
+
 # Dagster local state
 .DAGSTER_HOME/
 
